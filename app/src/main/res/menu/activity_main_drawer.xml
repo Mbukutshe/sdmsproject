@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item android:title="">
+            <menu>
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/home"
+            android:title="Home"
+            />
+
+        <item
+            android:id="@+id/nav_contacts"
+            android:icon="@drawable/contacts"
+            android:title="Contacts" />
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/about"
+            android:title="About" />
+        <item
+            android:id="@+id/nav_help"
+            android:icon="@drawable/help"
+            android:title="Help" />
+        <item
+            android:id="@+id/nav_exit"
+            android:icon="@drawable/exit"
+            android:title="Exit" />
+          </menu>
+        </item>
+
+    </group>
+
+
+    <group android:checkableBehavior="single">
+        <item android:title="Administrator">
+            <menu>
+                <item
+                    android:id="@+id/nav_upload"
+                    android:icon="@drawable/upload"
+                    android:title="Upload Document" />
+                <item
+                    android:id="@+id/nav_send"
+                    android:icon="@drawable/send"
+                    android:title="Send Message" />
+
+            </menu>
+        </item>
+    </group>
+
+</menu>
