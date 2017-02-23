@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity
         AdView adView=(AdView)findViewById(R.id.addView);
 
         AdRequest adRequest = new AdRequest.Builder().build();
-
+        adView.loadAd(adRequest);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Message(s)");
