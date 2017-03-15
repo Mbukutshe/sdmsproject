@@ -19,7 +19,7 @@ public class FirebaseInstanceIDService extends FirebaseInstanceIdService
     {
         OkHttpClient client = new OkHttpClient();
         RequestBody body = new FormBody.Builder().add("Token",token).build();
-        Request request = new Request.Builder().url("http://sdms.portfolioonline.co.za/register.php").post(body).build();
+        Request request = new Request.Builder().url("http://dms.plattdriveprimary.co.za/register.php").post(body).build();
         try
         {
             client.newCall(request).execute();

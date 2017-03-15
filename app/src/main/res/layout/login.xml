@@ -17,6 +17,7 @@
         android:layout_height="wrap_content"
         android:scrollbars="none"
         android:paddingTop="56dp"
+        android:paddingBottom="56dp"
         android:paddingLeft="24dp"
         android:paddingRight="24dp">
 
@@ -26,6 +27,14 @@
             android:layout_marginBottom="24dp"
             android:layout_gravity="center_horizontal" />
 
+        <TextView
+            android:id="@+id/error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FF00"
+            android:paddingLeft="56dp"
+            android:layout_marginBottom="24dp"
+            android:paddingRight="56dp"/>
         <!--  Name Label -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -33,9 +42,10 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp">
 
-            <EditText android:id="@+id/input_name"
+            <EditText android:id="@+id/input_username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimary"
                 android:inputType="textCapWords"
                 android:hint="Username" />
         </android.support.design.widget.TextInputLayout>
@@ -49,13 +59,14 @@
             <EditText android:id="@+id/input_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimary"
                 android:inputType="textPassword"
                 android:hint="Password"/>
         </android.support.design.widget.TextInputLayout>
 
         <!-- Signup Button -->
         <android.support.v7.widget.AppCompatButton
-            android:id="@+id/btn_signup"
+            android:id="@+id/btn_login"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"

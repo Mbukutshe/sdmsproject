@@ -60,7 +60,7 @@ public class downloads extends Fragment{
         {
             do
             {
-                allItems.add(new ItemObject(data.getString(1),data.getString(2),data.getString(3),data.getString(4),data.getString(5),data.getString(6)));
+                allItems.add(new ItemObject(data.getInt(0),data.getString(1),data.getString(2),data.getString(3),data.getString(4),data.getString(5),data.getString(6)));
             }
             while(data.moveToNext());
         }

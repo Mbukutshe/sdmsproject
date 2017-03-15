@@ -1,13 +1,12 @@
 package com.example.student.sdms;
 
-import android.content.ContentValues;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import java.util.HashMap;
 /**
  * Created by Student on 10/7/2016.
  */
@@ -24,7 +23,7 @@ public class SqliteController extends SQLiteOpenHelper
     {
         String query,query1;
         query = "CREATE TABLE IF NOT EXISTS Message ( messageId INTEGER PRIMARY KEY, message TEXT,author TEXT,date TEXT)";
-        query1= "CREATE TABLE IF NOT EXISTS Messages (messageId INTEGER PRIMARY KEY, message TEXT,subject Text,link Text,author TEXT,date TEXT,filename TEXT);";
+        query1= "CREATE TABLE IF NOT EXISTS Messages (messageId INTEGER PRIMARY KEY, message TEXT,subject Text,link Text,author TEXT,date TEXT,filename TEXT)";
         database.execSQL(query1);
         database.execSQL(query);
     }
@@ -36,31 +35,25 @@ public class SqliteController extends SQLiteOpenHelper
         database.execSQL(query);
         onCreate(database);
     }
-    public void insertMessage(String message,String subject,String author,String link,String date,String filename)
+    public void insertMessage(int messageId,String message,String subject,String author,String link,String date,String filename)
     {
         Log.d(LOGCAT,"insert");
         SQLiteDatabase database = this.getWritableDatabase();
-        String query = "INSERT INTO Messages (message,subject,link,author,date,filename) VALUES('"+message+"','"+subject+"', '"+link+"','"+author+"','"+date+"','"+filename+"');";
+        String query = "INSERT INTO Messages (messageId,message,subject,link,author,date,filename) VALUES("+messageId+",'"+message+"','"+subject+"', '"+link+"','"+author+"','"+date+"','"+filename+"')";
         Log.d("query",query);
         database.execSQL(query);
         database.close();
     }
-    public void insertMessag(String messageId,String message,String author,String date)
+    public void insertMessag(int messageId,String message,String author,String date)
     {
         Log.d(LOGCAT,"insert");
         SQLiteDatabase database = this.getWritableDatabase();
-        String query = "INSERT INTO Message (message,author,date) VALUES('"+message+"', '"+author+"', '"+date+"');";
+        String query = "INSERT INTO Message (messageId,message,author,date) VALUES("+messageId+",'"+message+"', '"+author+"', '"+date+"')";
         Log.d("query",query);
         database.execSQL(query);
         database.close();
     }
-    public int updateMessage(HashMap<String, String> queryValues)
-    {
-        SQLiteDatabase database = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("StudentName", queryValues.get("StudentName"));
-        return database.update("Students", values, "StudentId" + " = ?", new String[] { queryValues.get("StudentId") });
-    }
+
     public void deleteMessage(int id)
     {
         Log.d(LOGCAT,"delete");
@@ -93,26 +86,6 @@ public class SqliteController extends SQLiteOpenHelper
         Cursor cursor = database.query("Message",columns, null,null,null,null,"date DESC");
 
         return cursor;
-    }
-    public HashMap<String, String>getMessageInfo(String id)
-    {
-        HashMap<String, String> wordList = new HashMap<String, String>();
-        SQLiteDatabase database = this.getReadableDatabase();
-        String selectQuery = "SELECT * FROM Messages where messageId='"+id+"'";
-        Cursor cursor = database.rawQuery(selectQuery, null);
-        if (cursor.moveToFirst())
-        {
-            do
-            {
-                wordList.put("message", cursor.getString(1));
-                wordList.put("subject", cursor.getString(2));
-                wordList.put("link", cursor.getString(3));
-                wordList.put("author", cursor.getString(4));
-                wordList.put("date", cursor.getString(5));
-            }
-            while (cursor.moveToNext());
-        }
-        return wordList;
     }
 
 }

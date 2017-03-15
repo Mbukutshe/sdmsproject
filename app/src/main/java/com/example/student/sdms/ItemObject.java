@@ -6,15 +6,16 @@ package com.example.student.sdms;
 
 public class ItemObject {
 
-    private String messageId;
+    private int messageId;
     private String message;
     private String subject;
     private String link;
     private String author;
     private String date;
     private String filename;
-    public ItemObject(String message,String subject,String link,String author,String date,String filename)
+    public ItemObject(int messageId,String message,String subject,String link,String author,String date,String filename)
     {
+        this.messageId=messageId;
         this.message = message;
         this.subject = subject;
         this.link = link;
@@ -23,11 +24,11 @@ public class ItemObject {
         this.filename =filename;
     }
 
-    public String getMessageId()
+    public int getMessageId()
     {
         return messageId;
     }
-    public void setMessageId(String messageId)
+    public void setMessageId(int messageId)
     {
         this.messageId = messageId;
     }

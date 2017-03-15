@@ -1,24 +1,39 @@
 package com.example.student.sdms;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
+import android.app.Dialog;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextThemeWrapper;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.util.List;
 
 import static android.content.Context.DOWNLOAD_SERVICE;
@@ -34,12 +49,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
 
     public static class MessageHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
-        public TextView message,subject,link,author,date;
+        public TextView messageId,message,subject,link,author,date;
         public MessageHolder(View tv) {
             super(tv);
             message = (TextView)tv.findViewById(R.id.message_message);
             author = (TextView)tv.findViewById(R.id.author_message);
             date = (TextView)tv.findViewById(R.id.time_message);
+            messageId = (TextView)tv.findViewById(R.id.messageid);
         }
     }
     // Provide a suitable constructor (depends on the kind of dataset)
@@ -65,37 +81,84 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
     }
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(MessageHolder holder, final int position) {
+    public void onBindViewHolder(final MessageHolder holder, final int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
+        ImageView options = (ImageView)holder.itemView.findViewById(R.id.delete_message);
+        Context popup = new ContextThemeWrapper(context,R.style.popup);
+        final PopupMenu optionsMenu = new PopupMenu(popup,options);
+        MenuInflater inflater = optionsMenu.getMenuInflater();
+        inflater.inflate(R.menu.popup_delete,optionsMenu.getMenu());
 
         holder.message.setText(mDataset.get(position).getMessage());
-        holder.author.setText("by: "+mDataset.get(position).getAuthor());
+        holder.author.setText(context.getResources().getString(R.string.author)+" "+mDataset.get(position).getAuthor());
         holder.date.setText(mDataset.get(position).getDate());
+        holder.messageId.setText(""+mDataset.get(position).getMessageId());
         //animate(holder);
         final SqliteController controller = new SqliteController(context);
 
-        ImageView delete = (ImageView)holder.itemView.findViewById(R.id.delete_message);
-        delete.setOnClickListener(new View.OnClickListener() {
+        options.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
+                optionsMenu.show();
+            }
+        });
 
-                removeItem(position);
-                controller.deleteMessage(position);
+        optionsMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+           @Override
+           public boolean onMenuItemClick(MenuItem menuItem) {
+               int item = menuItem.getItemId();
+               if (item == R.id.delete_messages) {
+                   removeItem(position);
+                   controller.deleteMessage(Integer.parseInt(holder.messageId.getText().toString()));
+               }
+               return false;
+           }
+        });
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Dialog dialog = new Dialog(context);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.cardview_popup_message);
+                dialog.setCanceledOnTouchOutside(false);
+                TextView message = (TextView)dialog.findViewById(R.id.message_message);
+                TextView author = (TextView)dialog.findViewById(R.id.author_message);
+                TextView date = (TextView)dialog.findViewById(R.id.time_message);
+                TextView messageId = (TextView)dialog.findViewById(R.id.messageid);
+                TextView time = (TextView)dialog.findViewById(R.id.time_message);
+                ImageView back = (ImageView)dialog.findViewById(R.id.left_arrow);
+                back.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                    }
+                });
+                message.setText(holder.message.getText());
+                time.setText(holder.date.getText());
+                author.setText(" "+holder.author.getText());
+                dialog.show();
             }
         });
     }
+
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount()
     {
         return this.mDataset.size();
     }
+
     public void removeItem(int position)
     {
         mDataset.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position,mDataset.size());
+    }
+    public void addItem( List<ItemObject> newData)
+    {
+        mDataset.addAll(newData);
+        notifyItemInserted(0);
     }
 
 }

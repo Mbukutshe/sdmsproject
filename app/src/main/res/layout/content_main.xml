@@ -6,16 +6,13 @@
     android:id="@+id/content_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-
     android:background="#f4f4f4"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.student.sdms.MainActivity"
     tools:showIn="@layout/app_bar_main"
     android:scrollbars="none">
-
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/my_recycler_message"
@@ -23,8 +20,45 @@
         android:background="#f4f4f4"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="1dp"
+        android:paddingTop="1dp">
+
+        </android.support.v7.widget.RecyclerView>
+    <LinearLayout
+        android:id="@+id/footer"
+        android:layout_height="600dp"
+        android:layout_width="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/my_recycler_message"
+        android:layout_marginBottom="10dp">
+    <TextView
+        android:id="@+id/no_messages"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/question_message"
+        android:text="No Messages\n"
+        android:layout_weight="1"
+        android:textAppearance="@style/no_messages"
         />
+    <TextView
+        android:id="@+id/question_message"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/no_messages"
+        android:layout_alignParentBottom="true"
+        android:text="Do you want to open old messages?"
+        android:textAppearance="@style/question"/>
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btn_oldmessages"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="24dp"
+        android:layout_marginRight="24dp"
+        android:padding="12dp"
+        android:text="Yes,\tI want to"
+        android:textColor="@drawable/button_selector"
+        android:background="@drawable/button_background"/>
+    </LinearLayout>
    <com.google.android.gms.ads.AdView
        android:id="@+id/addView"
        android:layout_width="wrap_content"

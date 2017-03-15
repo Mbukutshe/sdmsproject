@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:app="http://schemas.android.com/tools"
     android:id="@+id/card_view"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
@@ -33,8 +32,8 @@
                 android:layout_height="match_parent"
                 android:layout_toLeftOf="@+id/time"
                 android:layout_alignParentLeft="true"
-                android:text="Subject:fdddddddddddddddddddddddddddddddddddddddddddddddddddddg"
-                android:layout_weight="100"
+                android:text="Subject:"
+                android:layout_weight="1"
                 android:textAppearance="@style/Subject"
                 android:maxLines="1"
                 android:ellipsize="end"
@@ -61,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|left"
                 android:paddingRight="50dp"
-                android:text="Lorem gfdgffffffffffffffffffffffffffffffffffffffffghhgfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffh"
+                android:text=""
                 android:maxLines="1"
                 android:ellipsize="end"
 
@@ -78,11 +77,22 @@
             <TextView
                 android:layout_below="@+id/message_layout"
                 android:id="@+id/author"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/options"
                 android:text="by:"
-                android:layout_weight="1"
+                android:textAppearance="@style/sender_style"
                />
+            <ImageView
+                android:id="@+id/options"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="480dp"
+                android:layout_alignParentRight="true"
+                android:textColor="@drawable/button_selector"
+                android:layout_toRightOf="@+id/author"
+                android:background="@drawable/threedots"
+                />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/footer"
@@ -91,51 +101,25 @@
             android:layout_alignParentBottom="true"
             android:layout_below="@+id/author_layout"
             android:layout_marginBottom="10dp">
-            <Button
-                android:id="@+id/view"
-                android:layout_width="60dp"
-                android:layout_height="30dp"
-                android:layout_marginRight="30dp"
-                android:text="view"
-                android:textColor="@drawable/button_selector"
-                android:textSize="12dp"
-                android:background="@drawable/button_background"/>
-            <Button
-                android:id="@+id/download"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_marginRight="30dp"
-                android:text="download"
-                android:textColor="@drawable/button_selector"
-                android:textSize="12dp"
-                android:background="@drawable/button_background"/>
-            <Button
-                android:id="@+id/clear"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:text="DELETE"
-                android:textColor="@drawable/button_selector"
-                android:textSize="12dp"
-                android:background="@drawable/button_background"/>
+
             <TextView
                 android:id="@+id/link"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_toRightOf="@+id/clear"
+                android:layout_toLeftOf="@+id/filename"
                 android:layout_alignParentRight="true" />
             <TextView
                 android:id="@+id/filename"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_toRightOf="@+id/clear"
+                android:layout_toRightOf="@+id/link"
                 android:layout_alignParentRight="true" />
-            <ImageView
-                android:id="@+id/options_menu"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/threedots"
-                android:layout_marginLeft="200dp"
-                android:layout_weight="1"/>
+            <TextView
+                android:id="@+id/docId"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_toRightOf="@+id/filename"
+                android:layout_alignParentRight="true" />
         </LinearLayout>
     </RelativeLayout>
 </android.support.v7.widget.CardView>

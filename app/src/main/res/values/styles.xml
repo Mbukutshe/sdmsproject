@@ -8,9 +8,8 @@
         <item name="android:textColorSecondary">@color/menuColor</item>
         <item name="android:actionMenuTextColor">@color/menuColor</item>
         <item name="itemTextAppearance">@style/TextAppearance</item>
-        <item name="android:textAppearanceSmallPopupMenu">@style/MyPopup</item>
-        <item name="android:textAppearanceLargePopupMenu">@style/MyPopupL</item>
-        <item name="android:popupBackground">@color/menuColor</item>
+
+        <item name="android:popupMenuStyle">@style/popup</item>
 
     </style>
 
@@ -47,7 +46,7 @@
     <style name="MyPopupL" parent="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Small">
         <item name="android:textColor">@color/menuColor</item>
     </style>
-    <style name="popup" parent="Widget.AppCompat.PopupMenu.Overflow">
+    <style name="popup" parent="@android:style/Widget.PopupMenu">
         <item name="android:textColor">@color/menuColor</item>
     </style>
 </resources>

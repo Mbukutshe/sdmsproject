@@ -27,7 +27,7 @@ public class help extends Activity {
     }
     public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
         myView = inflater.inflate(R.layout.login,container,false);
-        button =(AppCompatButton)myView.findViewById(R.id.btn_signup);
+        button =(AppCompatButton)myView.findViewById(R.id.btn_login);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
