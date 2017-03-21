@@ -2,7 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/card_view_message"
-    android:layout_height="500dp"
+    android:layout_height="600dp"
     android:layout_width="match_parent"
     android:layout_margin="0dp">
     <LinearLayout
@@ -37,18 +37,47 @@
     <RelativeLayout
         android:id="@+id/title"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingBottom="0dp"
         android:layout_marginTop="50dp">
         <LinearLayout
-            android:id="@+id/author_layout"
+            android:id="@+id/from_layout"
             android:layout_marginTop="30dp"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:layout_below="@+id/message_layout"
+            android:paddingLeft="2dp"
+            android:layout_marginBottom="8dp">
+            <EditText android:id="@+id/from_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimary"
+                android:background="@drawable/message_border_line"
+                android:hint="From..." />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/subject_layout"
+            android:layout_marginTop="30dp"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/from_layout"
+            android:paddingLeft="2dp"
+            android:layout_marginBottom="8dp">
+            <EditText android:id="@+id/subject_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimary"
+                android:background="@drawable/message_border_line"
+                android:hint="Subject..." />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/input_layout"
+            android:layout_marginTop="30dp"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/subject_layout"
             android:paddingLeft="2dp"
             android:layout_marginBottom="8dp">
             <EditText android:id="@+id/input_message"
@@ -66,8 +95,8 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:layout_alignParentBottom="true"
-            android:layout_below="@+id/author_layout"
-            android:layout_marginBottom="10dp">
+            android:layout_below="@+id/input_layout"
+            android:layout_marginBottom="5dp">
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn_send"
                 android:layout_width="fill_parent"
@@ -82,11 +111,11 @@
         <LinearLayout
             android:id="@+id/title_network"
             android:layout_width="match_parent"
-            android:layout_height="70dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:background="#F4F4F4"
             android:paddingLeft="200dp"
-            android:paddingTop="15dp"
+            android:paddingTop="0dp"
             android:paddingRight="2dp"
             android:layout_marginBottom="0dp">
             <ImageButton

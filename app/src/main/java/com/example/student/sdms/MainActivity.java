@@ -31,6 +31,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -41,6 +42,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -68,12 +70,20 @@ import net.gotev.uploadservice.UploadNotificationConfig;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.zip.Inflater;
 
 import in.gauriinfotech.commons.Commons;
-
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
     FragmentManager fragmentManager = getSupportFragmentManager();
@@ -81,7 +91,7 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private Menu menu;
-    public static Menu menus;
+    public  static Menu menus;
     public  static int feed=0;
     private Uri filepath;
     private TextView choose;
@@ -93,10 +103,10 @@ public class MainActivity extends AppCompatActivity
     public static String uploadFilePath="";
     public static String uploadFileName="";
     private final String UPLOAD_URL="http://sdms.portfolioonline.co.za/upload.php";
-
+    RequestQueue requestQueue;
     private static boolean active=true;
     public static boolean messageActive=true;
-
+    public static Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,16 +114,17 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
+        menus =menu;
+        context = getApplicationContext();
         MobileAds.initialize(getApplicationContext(),getString(R.string.ads_unit_id));
         AdView adView=(AdView)findViewById(R.id.addView);
+
 
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Message(s)");
+        getSupportActionBar().setTitle("Messages");
 
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_message);
         mRecyclerView.setHasFixedSize(true);
@@ -145,7 +156,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
-                    getSupportActionBar().setTitle("Message(s)");
+                    getSupportActionBar().setTitle("Messages");
                     fragmentManager.beginTransaction().replace(R.id.content_main,new exit()).commit();
                     fab.setImageDrawable(ContextCompat.getDrawable(getBaseContext(),R.drawable.feedback));
 
@@ -182,7 +193,7 @@ public class MainActivity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         this.menu=menu;
-        menus=menu;
+        this.menus=menu;
         MenuItem documentOption = menu.findItem(R.id.action_download);
         documentOption.setVisible(true);
         MenuItem messageOption = menu.findItem(R.id.action_messages);
@@ -200,7 +211,7 @@ public class MainActivity extends AppCompatActivity
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_download) {
-            getSupportActionBar().setTitle("Document(s)");
+            getSupportActionBar().setTitle("Documents");
             //menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.not));
             fragmentManager.beginTransaction().replace(R.id.content_main,new downloads()).commit();
             fab.setImageDrawable(ContextCompat.getDrawable(getBaseContext(),R.drawable.feedback));
@@ -217,7 +228,7 @@ public class MainActivity extends AppCompatActivity
         else
             if(id==R.id.action_messages)
             {
-                getSupportActionBar().setTitle("Message(s)");
+                getSupportActionBar().setTitle("Messages");
                 //menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.not));
                 fragmentManager.beginTransaction().replace(R.id.content_main,new exit()).commit();
                 fab.setImageDrawable(ContextCompat.getDrawable(getBaseContext(),R.drawable.feedback));
@@ -252,20 +263,20 @@ public class MainActivity extends AppCompatActivity
         final FragmentManager fragmentManager = getSupportFragmentManager();
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         if (id == R.id.nav_about) {
-            getSupportActionBar().setTitle("About");
+            getSupportActionBar().setTitle("Website");
             fragmentManager.beginTransaction().replace(R.id.content_main,new about()).commit();
             fab.setImageDrawable(ContextCompat.getDrawable(getBaseContext(),R.drawable.feedback));
 
             MenuItem documentOption = menu.findItem(R.id.action_download);
-            documentOption.setVisible(true);
+            documentOption.setVisible(false);
 
             MenuItem messageOption = menu.findItem(R.id.action_messages);
-            messageOption.setVisible(true);
+            messageOption.setVisible(false);
             messageActive =false;
         }
         else if (id == R.id.nav_home) {
 
-            getSupportActionBar().setTitle("Message(s)");
+            getSupportActionBar().setTitle("Messages");
             fragmentManager.beginTransaction().replace(R.id.content_main,new exit()).commit();
             fab.setImageDrawable(ContextCompat.getDrawable(getBaseContext(),R.drawable.feedback));
 
@@ -461,8 +472,11 @@ public class MainActivity extends AppCompatActivity
                             }
                         });
                         final TextView offline = (TextView)dialog.findViewById(R.id.network_state_message);
-                        EditText message =(EditText)dialog.findViewById(R.id.input_message);
+                        final EditText messageMessage =(EditText)dialog.findViewById(R.id.input_message);
+                        final EditText fromMessage =(EditText)dialog.findViewById(R.id.from_message);
+                        final  EditText subjectMessage =(EditText)dialog.findViewById(R.id.subject_message);
                         AppCompatButton send = (AppCompatButton)dialog.findViewById(R.id.btn_send);
+
                         send.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -472,6 +486,68 @@ public class MainActivity extends AppCompatActivity
                                 boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
                                 if(isConnected)
                                 {
+
+                                    final String insertUrl = "http://dms.plattdriveprimary.co.za/sendmessage.php";
+                                    final String from,subject,message;
+                                    from = fromMessage.getText().toString();
+                                    subject = subjectMessage.getText().toString();
+                                    message = messageMessage.getText().toString();
+                                    dialogprogress = ProgressDialog.show(dialog.getContext(), "", "Sending message...", true);
+
+                                    new Thread(new Runnable() {
+                                        public void run() {
+                                            runOnUiThread(new Runnable() {
+                                                public void run() {
+
+                                                }
+                                            });
+                                        }
+                                    }).start();
+                                    StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+                                        @Override
+                                        public void onResponse(String response) {
+                                            dialogprogress.dismiss();
+                                            dialog.dismiss();
+                                            LayoutInflater infla = LayoutInflater.from(getApplicationContext());
+                                            View layout =infla.inflate(R.layout.toast_container_layout,(ViewGroup)findViewById(R.id.toast_layout));
+                                            TextView textview = (TextView)layout.findViewById(R.id.toast_message);
+                                            layout.setBackgroundResource(R.color.toastColor);
+                                            textview.setText("Message has been sent.");
+                                            Toast toast = new Toast(context);
+                                            toast.setGravity(Gravity.CENTER_VERTICAL,0,0);
+                                            toast.setDuration(Toast.LENGTH_LONG);
+                                            toast.setView(layout);
+                                            toast.show();
+
+                                        }
+                                    }, new Response.ErrorListener() {
+                                        @Override
+                                        public void onErrorResponse(VolleyError error) {
+                                            offline.setText("error while sending a message!");
+                                            textAnim.setDuration(50);
+                                            textAnim.setStartOffset(20);
+                                            textAnim.setRepeatMode(Animation.REVERSE);
+                                            textAnim.setRepeatCount(3);
+                                            offline.startAnimation(textAnim);
+                                            dialogprogress.dismiss();
+                                        }
+                                    }) {
+                                        @Override
+                                        protected Map<String, String> getParams() throws AuthFailureError {
+                                            Map<String, String> parameters = new HashMap<String,String>();
+
+                                            parameters.put("from", from);
+                                            parameters.put("subject", subject);
+                                            parameters.put("message", message);
+                                            parameters.put("source", "android");
+                                            parameters.put("urgent", "Yes");
+                                            return parameters;
+                                        }
+                                    };
+                                    requestQueue = Volley.newRequestQueue(dialog.getContext());
+                                    requestQueue.add(request);
+
+
 
                                 }
                                 else
@@ -519,7 +595,7 @@ public class MainActivity extends AppCompatActivity
         {
             do
             {
-                allItems.add(new ItemObject(data.getInt(0),data.getString(1),"","",data.getString(2),data.getString(3),""));
+                allItems.add(new ItemObject(data.getInt(0),data.getString(1),data.getString(4),"",data.getString(2),data.getString(3),"",data.getString(5)));
             }
             while(data.moveToNext());
         }
@@ -639,7 +715,7 @@ public class MainActivity extends AppCompatActivity
                 conn.setUseCaches(false); // Don't use a Cached Copy
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Connection", "Keep-Alive");
-               // conn.setRequestProperty("ENCTYPE", "multipart/form-data");
+                conn.setRequestProperty("ENCTYPE", "multipart/form-data");
                 conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
                 conn.setRequestProperty("uploaded_file", fileName);
 
@@ -734,13 +810,13 @@ public class MainActivity extends AppCompatActivity
     {
         return active;
     }
-    public void newMessage()
+    public static void newMessage()
     {
         MenuItem messages = menus.getItem(R.id.action_messages);
         messages.setIcon(R.drawable.newmessages);
-        LayoutInflater inflater = (LayoutInflater)getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = LayoutInflater.from(context);
         ImageView iv = (ImageView)inflater.inflate(R.layout.blinkmessage,null);
-        Animation anim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.blinkanim);
+        Animation anim = AnimationUtils.loadAnimation(context,R.anim.blinkanim);
         iv.startAnimation(anim);
         messages.setActionView(iv);
     }

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="about_text" parent="@android:style/TextAppearance.DeviceDefault.Medium">
+        <item name="android:textSize">20dp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
     <style name="Subject" parent="@android:style/TextAppearance.DeviceDefault.Medium">
         <item name="android:textSize">17dp</item>
         <item name="android:textColor">@color/colorPrimary</item>

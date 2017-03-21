@@ -37,18 +37,21 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             String message = remoteMessage.getData().get("message");
             String author = remoteMessage.getData().get("author");
             String date = remoteMessage.getData().get("date");
-            controller.insertMessag(messageId, message,author,date);
+            String urgent = remoteMessage.getData().get("urgent");
+            String subject = remoteMessage.getData().get("subject");
+            controller.insertMessag(messageId, message,author,date,urgent,subject);
             if(MainActivity.isAppActive())
             {
-               // new MainActivity().newMessage();
+                //MainActivity.newMessage();
 
-                    List<ItemObject> myDataset = getAllItemList();
-                    new MessageAdapter(getApplicationContext(),myDataset).addItem(myDataset);
-
+                List<ItemObject> myDataset = getAllItemList();
+                MessageAdapter adapter = new MessageAdapter(getApplicationContext(),myDataset);
+                adapter.addItem(myDataset);
+                showNotification(message,"Platt Drive App",true);
             }
             else
             {
-                showNotification(message,"Platt Drive App");
+                showNotification(message,"Platt Drive App",true);
             }
 
         }
@@ -63,9 +66,10 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 String date = remoteMessage.getData().get("date");
                 String filename = remoteMessage.getData().get("filename");
                 controller.insertMessage(messageId,message,subject,author,link,date,filename);
-                showNotification(message, "Platt Drive App");
+                showNotification(message, "Platt Drive App",false);
             }
-        try {
+        try
+        {
             Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
             r.play();
@@ -73,14 +77,37 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             e.printStackTrace();
         }
     }
-    private void showNotification(String message,String subject)
+    private void showNotification(String message,String subject,boolean isMessage)
     {
-        Intent in = new Intent(this,SplashScreen.class);
-        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,in,PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setAutoCancel(true).setContentTitle(subject).setContentText(message).setSmallIcon(R.drawable.llogo).setContentIntent(pendingIntent);
-        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        manager.notify(0,builder.build());
+
+        if(MainActivity.isAppActive() && isMessage)
+        {
+            Intent in = new Intent(this,MainActivity.class);
+            in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this,0,in,PendingIntent.FLAG_UPDATE_CURRENT);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setAutoCancel(true).setContentTitle(subject).setContentText(message).setSmallIcon(R.drawable.llogo).setContentIntent(pendingIntent);
+            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            manager.notify(0,builder.build());
+        }
+        else
+            if(MainActivity.isAppActive() && !isMessage)
+            {
+                Intent in = new Intent(this,SplashScreen.class);
+                in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                PendingIntent pendingIntent = PendingIntent.getActivity(this,0,in,PendingIntent.FLAG_UPDATE_CURRENT);
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setAutoCancel(true).setContentTitle(subject).setContentText(message).setSmallIcon(R.drawable.llogo).setContentIntent(pendingIntent);
+                NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                manager.notify(0,builder.build());
+            }
+            else
+            {
+                Intent in = new Intent(this,downloads.class);
+                in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                PendingIntent pendingIntent = PendingIntent.getActivity(this,0,in,PendingIntent.FLAG_UPDATE_CURRENT);
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setAutoCancel(true).setContentTitle(subject).setContentText(message).setSmallIcon(R.drawable.llogo).setContentIntent(pendingIntent);
+                NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                manager.notify(0,builder.build());
+            }
     }
     private List<ItemObject> getAllItemList(){
 
@@ -91,7 +118,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         {
             do
             {
-                allItems.add(new ItemObject(data.getInt(0),data.getString(1),"","",data.getString(2),data.getString(3),""));
+                allItems.add(new ItemObject(data.getInt(0),data.getString(1),data.getString(4),"",data.getString(2),data.getString(3),"",data.getString(5)));
             }
             while(data.moveToNext());
         }

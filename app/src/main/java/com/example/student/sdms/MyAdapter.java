@@ -9,6 +9,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
@@ -144,7 +146,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         });
 
 
-
         options.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -165,19 +166,38 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                 else
                     if(item==R.id.download_doc)
                     {
-                        prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                        dm = (DownloadManager)context.getSystemService(DOWNLOAD_SERVICE);
-                        Uri resource = Uri.parse(holder.link.getText().toString());
-                        DownloadManager.Request request = new DownloadManager.Request(resource);
-                        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE | DownloadManager.Request.NETWORK_WIFI);
-                        request.setAllowedOverRoaming(false);
-                        request.setTitle(holder.filename.getText().toString());
-                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, holder.filename.getText().toString());
-                        request.setDescription("downloading ..... " + holder.filename.getText().toString());
-                        request.setVisibleInDownloadsUi(true);
-                        long id = dm.enqueue(request);
-                        prefs.edit().putLong(DL_ID, id).commit();
-                        context.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+                        ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+                        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+                        if(isConnected)
+                        {
+                            prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                            dm = (DownloadManager) context.getSystemService(DOWNLOAD_SERVICE);
+                            Uri resource = Uri.parse(holder.link.getText().toString());
+                            DownloadManager.Request request = new DownloadManager.Request(resource);
+                            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE | DownloadManager.Request.NETWORK_WIFI);
+                            request.setAllowedOverRoaming(false);
+                            request.setTitle(holder.filename.getText().toString());
+                            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, holder.filename.getText().toString());
+                            request.setDescription("downloading ..... " + holder.filename.getText().toString());
+                            request.setVisibleInDownloadsUi(true);
+                            long id = dm.enqueue(request);
+                            prefs.edit().putLong(DL_ID, id).commit();
+                            context.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+                        }
+                        else
+                        {
+                            LayoutInflater infla = LayoutInflater.from(holder.itemView.getContext());
+                            View layout =infla.inflate(R.layout.toast_container_layout,(ViewGroup)holder.itemView.findViewById(R.id.toast_layout));
+                            TextView textview = (TextView)layout.findViewById(R.id.toast_message);
+                            layout.setBackgroundResource(R.color.toastColor);
+                            textview.setText("No internet connection. Please check internet settings or the strength isn't good enough.");
+                            Toast toast = new Toast(context);
+                            toast.setGravity(Gravity.CENTER_VERTICAL,0,0);
+                            toast.setDuration(Toast.LENGTH_LONG);
+                            toast.setView(layout);
+                            toast.show();
+                        }
                     }
                     else
                         if(item==R.id.delete_doc)

@@ -43,7 +43,7 @@ public class feedback extends Fragment{
                 Intent i = new Intent(Intent.ACTION_SEND);
                 i.setType("message/rfc822");
                 i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"wisemanmbukutshe@gmail.com"});
-                i.putExtra(Intent.EXTRA_SUBJECT, "Feedback from SDMS");
+                i.putExtra(Intent.EXTRA_SUBJECT, "Feedback from PLATT DRIVE APP");
                 i.putExtra(Intent.EXTRA_TEXT   , "Name: \t"+nam+"\nE-mail: \t"+mail+"\nPhone No: \t"+cell+"\n\n"+text);
                 try {
                     startActivity(Intent.createChooser(i, "Send mail..."));

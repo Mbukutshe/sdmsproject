@@ -13,7 +13,8 @@ public class ItemObject {
     private String author;
     private String date;
     private String filename;
-    public ItemObject(int messageId,String message,String subject,String link,String author,String date,String filename)
+    private String urgent;
+    public ItemObject(int messageId,String message,String subject,String link,String author,String date,String filename,String urgent)
     {
         this.messageId=messageId;
         this.message = message;
@@ -22,6 +23,7 @@ public class ItemObject {
         this.author = author;
         this.date = date;
         this.filename =filename;
+        this.urgent =urgent;
     }
 
     public int getMessageId()
@@ -80,4 +82,13 @@ public class ItemObject {
     {
         this.filename = filename;
     }
+    public String getUrgent()
+    {
+        return urgent;
+    }
+    public void setUrgent(String urgent)
+    {
+        this.urgent = urgent;
+    }
+
 }

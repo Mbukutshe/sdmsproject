@@ -49,13 +49,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
 
     public static class MessageHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
-        public TextView messageId,message,subject,link,author,date;
+        public TextView messageId,message,subject,link,author,date,urgent,urgent_text;
         public MessageHolder(View tv) {
             super(tv);
             message = (TextView)tv.findViewById(R.id.message_message);
             author = (TextView)tv.findViewById(R.id.author_message);
             date = (TextView)tv.findViewById(R.id.time_message);
             messageId = (TextView)tv.findViewById(R.id.messageid);
+            urgent = (TextView)tv.findViewById(R.id.urgent);
+            subject =(TextView)tv.findViewById(R.id.subject_message);
         }
     }
     // Provide a suitable constructor (depends on the kind of dataset)
@@ -94,6 +96,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
         holder.author.setText(context.getResources().getString(R.string.author)+" "+mDataset.get(position).getAuthor());
         holder.date.setText(mDataset.get(position).getDate());
         holder.messageId.setText(""+mDataset.get(position).getMessageId());
+        holder.subject.setText("Subject:\t"+mDataset.get(position).getSubject());
+        if(mDataset.get(position).getUrgent().toString().equalsIgnoreCase("Yes"))
+        {
+            holder.urgent.setBackgroundResource(R.drawable.important);
+        }
         //animate(holder);
         final SqliteController controller = new SqliteController(context);
 
@@ -115,17 +122,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
                return false;
            }
         });
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onLongClick(View view) {
                 final Dialog dialog = new Dialog(context);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setContentView(R.layout.cardview_popup_message);
                 dialog.setCanceledOnTouchOutside(false);
                 TextView message = (TextView)dialog.findViewById(R.id.message_message);
                 TextView author = (TextView)dialog.findViewById(R.id.author_message);
-                TextView date = (TextView)dialog.findViewById(R.id.time_message);
-                TextView messageId = (TextView)dialog.findViewById(R.id.messageid);
                 TextView time = (TextView)dialog.findViewById(R.id.time_message);
                 ImageView back = (ImageView)dialog.findViewById(R.id.left_arrow);
                 back.setOnClickListener(new View.OnClickListener() {
@@ -138,6 +143,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
                 time.setText(holder.date.getText());
                 author.setText(" "+holder.author.getText());
                 dialog.show();
+                return false;
             }
         });
     }
@@ -159,6 +165,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
     {
         mDataset.addAll(newData);
         notifyItemInserted(0);
+        notifyDataSetChanged();
     }
 
 }

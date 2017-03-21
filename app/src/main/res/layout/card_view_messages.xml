@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:paddingBottom="10dp">
+        android:paddingBottom="1dp">
         <LinearLayout
             android:id="@+id/title_message"
             android:layout_width="match_parent"
@@ -27,14 +27,14 @@
             android:paddingLeft="2dp"
             android:elevation="4dp">
             <TextView
-                android:id="@+id/author_message"
+                android:id="@+id/subject_message"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_toLeftOf="@+id/time_message"
                 android:layout_alignParentLeft="true"
-                android:text=""
-                android:textSize="15dp"
+                android:text="Subject:"
                 android:layout_weight="1"
+                android:textAppearance="@style/Subject"
                 />
             <TextView
                 android:id="@+id/time_message"
@@ -46,7 +46,7 @@
         </LinearLayout>
         <LinearLayout
             android:id="@+id/message_layout_message"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="5dp"
             android:layout_below="@+id/title_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -61,15 +61,14 @@
                 android:paddingRight="50dp"
                 android:maxLines="1"
                 android:ellipsize="end"/>
-            <ImageView
-                android:layout_toRightOf="@+id/message_message"
-                android:id="@+id/delete_message"
+            <TextView
+                android:id="@+id/urgent"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:layout_marginLeft="0dp"
-                android:layout_marginRight="50dp"
-                android:layout_alignParentRight="true"
-                android:src="@drawable/threedots"/>
+                android:layout_marginLeft="6dp"
+                android:background="@drawable/notimportant"
+                android:layout_toRightOf="@+id/message_message"
+                android:layout_alignParentRight="true" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/author_layout_message"
@@ -78,21 +77,37 @@
             android:layout_width="match_parent"
             android:layout_below="@+id/message_layout_message"
             android:paddingLeft="2dp">
-            android:layout_marginBottom="4dp">
+            android:layout_marginBottom="0dp">
             <TextView
                 android:layout_below="@+id/message_layout_message"
-                android:id="@+id/info_text_message"
+                android:id="@+id/author_message"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:text=""
+                android:layout_weight="1"
+                android:textAppearance="@style/sender_style"/>
+            <TextView
+                android:id="@+id/urgent_text"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:text=""
-                android:layout_weight="1"/>
-
+                android:layout_toRightOf="@+id/info_text_message"
+                android:layout_alignParentRight="true" />
             <TextView
                 android:id="@+id/messageid"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_toRightOf="@+id/delete_message"
-                android:layout_alignParentRight="true" />
+                android:layout_toRightOf="@+id/urgent_text"
+                android:layout_alignParentRight="true"/>
+
+            <ImageView
+                android:layout_toRightOf="@+id/messageid"
+                android:id="@+id/delete_message"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="2dp"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/threedots"/>
         </LinearLayout>
     </RelativeLayout>
 </android.support.v7.widget.CardView>

@@ -22,7 +22,7 @@ public class SqliteController extends SQLiteOpenHelper
     public void onCreate(SQLiteDatabase database)
     {
         String query,query1;
-        query = "CREATE TABLE IF NOT EXISTS Message ( messageId INTEGER PRIMARY KEY, message TEXT,author TEXT,date TEXT)";
+        query = "CREATE TABLE IF NOT EXISTS Message ( messageId INTEGER PRIMARY KEY, message TEXT,author TEXT,date TEXT,subject TEXT,urgent TEXT)";
         query1= "CREATE TABLE IF NOT EXISTS Messages (messageId INTEGER PRIMARY KEY, message TEXT,subject Text,link Text,author TEXT,date TEXT,filename TEXT)";
         database.execSQL(query1);
         database.execSQL(query);
@@ -44,11 +44,11 @@ public class SqliteController extends SQLiteOpenHelper
         database.execSQL(query);
         database.close();
     }
-    public void insertMessag(int messageId,String message,String author,String date)
+    public void insertMessag(int messageId,String message,String author,String date,String urgent,String subject)
     {
         Log.d(LOGCAT,"insert");
         SQLiteDatabase database = this.getWritableDatabase();
-        String query = "INSERT INTO Message (messageId,message,author,date) VALUES("+messageId+",'"+message+"', '"+author+"', '"+date+"')";
+        String query = "INSERT INTO Message (messageId,message,author,date,subject,urgent) VALUES("+messageId+",'"+message+"', '"+author+"', '"+date+"','"+subject+"','"+urgent+"')";
         Log.d("query",query);
         database.execSQL(query);
         database.close();
@@ -81,7 +81,7 @@ public class SqliteController extends SQLiteOpenHelper
     public Cursor getAllMessage()
     {
         String selectQuery = "SELECT * FROM Message";
-        String []columns = {"messageId","message","author","date"};
+        String []columns = {"messageId","message","author","date","subject","urgent"};
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.query("Message",columns, null,null,null,null,"date DESC");
 

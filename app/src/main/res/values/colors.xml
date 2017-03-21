@@ -7,4 +7,5 @@
     <color name="titleBackgroundColor">#00a1f1</color>
     <color name="transparent">#FFFFFF</color>
     <color name="menuColor">#627984</color>
+    <color name="toastColor">#bec0c4</color>
 </resources>
