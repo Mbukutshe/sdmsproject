@@ -97,7 +97,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
         holder.date.setText(mDataset.get(position).getDate());
         holder.messageId.setText(""+mDataset.get(position).getMessageId());
         holder.subject.setText("Subject:\t"+mDataset.get(position).getSubject());
-        if(mDataset.get(position).getUrgent().toString().equalsIgnoreCase("Yes"))
+        if(mDataset.get(position).getUrgent().toString().equals("Yes"))
         {
             holder.urgent.setBackgroundResource(R.drawable.important);
         }

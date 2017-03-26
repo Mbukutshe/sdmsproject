@@ -47,9 +47,12 @@ import android.view.Window;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.DataOutputStream;
@@ -59,6 +62,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -96,10 +100,11 @@ public class MainActivity extends AppCompatActivity
     private Uri filepath;
     private TextView choose;
     int serverResponseCode = 0;
+    String urgent;
     ProgressDialog dialogprogress = null;
     TextView messageText,networkState;
     AppCompatButton uploadButton;
-    String upLoadServerUri = "http://sdms.portfolioonline.co.za/simpleupload.php";
+    String upLoadServerUri = "http://dms.plattdriveprimary.co.za/simpleupload.php";
     public static String uploadFilePath="";
     public static String uploadFileName="";
     private final String UPLOAD_URL="http://sdms.portfolioonline.co.za/upload.php";
@@ -365,8 +370,9 @@ public class MainActivity extends AppCompatActivity
                             @Override
                             public void onClick(View view) {
                                 Intent intent = new Intent();
-                                intent.setType("application/*");
+                                intent.setType("*/*");
                                 intent.setAction(Intent.ACTION_GET_CONTENT);
+                                intent.addCategory(Intent.CATEGORY_OPENABLE);
                                 startActivityForResult(Intent.createChooser(intent,"Select document"),1);
 
                             }
@@ -471,6 +477,21 @@ public class MainActivity extends AppCompatActivity
                                 dialog.dismiss();
                             }
                         });
+                        Spinner spinner = (Spinner)dialog.findViewById(R.id.spinner);
+                        ArrayAdapter<CharSequence>adapter = ArrayAdapter.createFromResource(dialog.getContext(),R.array.urgent,android.R.layout.simple_spinner_item);
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        spinner.setAdapter(adapter);
+                        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                                urgent = adapterView.getItemAtPosition(i).toString();
+                            }
+
+                            @Override
+                            public void onNothingSelected(AdapterView<?> adapterView) {
+                                urgent = adapterView.getItemAtPosition(0).toString();
+                            }
+                        });
                         final TextView offline = (TextView)dialog.findViewById(R.id.network_state_message);
                         final EditText messageMessage =(EditText)dialog.findViewById(R.id.input_message);
                         final EditText fromMessage =(EditText)dialog.findViewById(R.id.from_message);
@@ -501,23 +522,16 @@ public class MainActivity extends AppCompatActivity
 
                                                 }
                                             });
+
+
                                         }
                                     }).start();
-                                    StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+                                    StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>()
+                                    {
                                         @Override
                                         public void onResponse(String response) {
                                             dialogprogress.dismiss();
-                                            dialog.dismiss();
-                                            LayoutInflater infla = LayoutInflater.from(getApplicationContext());
-                                            View layout =infla.inflate(R.layout.toast_container_layout,(ViewGroup)findViewById(R.id.toast_layout));
-                                            TextView textview = (TextView)layout.findViewById(R.id.toast_message);
-                                            layout.setBackgroundResource(R.color.toastColor);
-                                            textview.setText("Message has been sent.");
-                                            Toast toast = new Toast(context);
-                                            toast.setGravity(Gravity.CENTER_VERTICAL,0,0);
-                                            toast.setDuration(Toast.LENGTH_LONG);
-                                            toast.setView(layout);
-                                            toast.show();
+                                            offline.setText("Message has been sent!");
 
                                         }
                                     }, new Response.ErrorListener() {
@@ -529,25 +543,22 @@ public class MainActivity extends AppCompatActivity
                                             textAnim.setRepeatMode(Animation.REVERSE);
                                             textAnim.setRepeatCount(3);
                                             offline.startAnimation(textAnim);
-                                            dialogprogress.dismiss();
                                         }
+
                                     }) {
                                         @Override
-                                        protected Map<String, String> getParams() throws AuthFailureError {
-                                            Map<String, String> parameters = new HashMap<String,String>();
-
+                                        protected Map<String,String> getParams(){
+                                            Map<String,String> parameters = new HashMap<String,String>();
                                             parameters.put("from", from);
                                             parameters.put("subject", subject);
                                             parameters.put("message", message);
-                                            parameters.put("source", "android");
-                                            parameters.put("urgent", "Yes");
+                                            parameters.put("urgent", urgent);
                                             return parameters;
                                         }
                                     };
-                                    requestQueue = Volley.newRequestQueue(dialog.getContext());
+                                    request.setRetryPolicy(new DefaultRetryPolicy(0,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                                    requestQueue = Volley.newRequestQueue(getApplicationContext( ));
                                     requestQueue.add(request);
-
-
 
                                 }
                                 else
@@ -632,7 +643,6 @@ public class MainActivity extends AppCompatActivity
         String name = choose.getText().toString().trim();
         String path = getRealPath(getApplicationContext(),filepath);
         uploadFilePath=path;
-        uploadFileName = path.substring(path.lastIndexOf("/")+1);
         if(path == null)
         {
 
@@ -692,8 +702,7 @@ public class MainActivity extends AppCompatActivity
 
             runOnUiThread(new Runnable() {
                 public void run() {
-                    messageText.setText("Source File not exist :"
-                            +uploadFilePath );
+                    messageText.setText("Source File not exist :"+uploadFilePath );
                 }
             });
 

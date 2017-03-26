@@ -4,15 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#ffffff"
     android:scrollbars="none"
     tools:layout_editor_absoluteX="0dp"
     tools:layout_editor_absoluteY="0dp">
-    <android.support.constraint.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#ffffff"
     android:layout_width="match_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="match_parent">
 
     <EditText
         android:layout_width="0dp"
@@ -62,7 +62,7 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginRight="16dp"
         app:layout_constraintHorizontal_bias="0.45"
-        android:layout_width="0dp" />
+        android:layout_width="0dp"/>
 
     <EditText
         android:layout_height="150dp"

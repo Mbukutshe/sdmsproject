@@ -13,4 +13,8 @@
     <string name="author">By:</string>
 
     <string name="about">PlattDrive App Version 1.0 Accomodates All Parties of A School.</string>
+    <string-array name ="urgent">
+        <item>Yes</item>
+        <item>No</item>
+    </string-array>
 </resources>

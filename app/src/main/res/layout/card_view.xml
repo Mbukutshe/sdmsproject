@@ -44,6 +44,7 @@
                 android:layout_height="match_parent"
                 android:layout_toRightOf="@+id/info_text"
                 android:layout_alignParentRight="true"
+                android:textColor="@color/colorPrimary"
                 android:text="Time"
                 />
         </LinearLayout>
@@ -60,6 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|left"
                 android:paddingRight="50dp"
+                android:textColor="@color/colorPrimary"
                 android:text=""
                 android:maxLines="1"
                 android:ellipsize="end"

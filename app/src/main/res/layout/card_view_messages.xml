@@ -42,6 +42,7 @@
                 android:layout_height="match_parent"
                 android:layout_toRightOf="@+id/info_text_message"
                 android:layout_alignParentRight="true"
+                android:textColor="@color/colorPrimary"
                 android:text="Time"/>
         </LinearLayout>
         <LinearLayout
@@ -57,6 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|left"
                 android:text=""
+                android:textColor="@color/colorPrimary"
                 android:layout_toLeftOf="@+id/delete_message"
                 android:paddingRight="50dp"
                 android:maxLines="1"

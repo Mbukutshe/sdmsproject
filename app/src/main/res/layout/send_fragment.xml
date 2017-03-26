@@ -2,9 +2,17 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/card_view_message"
-    android:layout_height="600dp"
+    android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:layout_margin="0dp">
+    <ScrollView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:scrollbars="none">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <LinearLayout
         android:id="@+id/title_layout"
         android:layout_width="match_parent"
@@ -13,7 +21,7 @@
         android:background="@color/colorPrimary"
         android:paddingLeft="2dp"
         android:paddingRight="2dp"
-        android:elevation="4dp"
+        android:elevation="2dp"
         android:layout_marginBottom="20dp">
         <ImageButton
             android:id="@+id/left_arrow_message"
@@ -28,21 +36,23 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginLeft="20dp"
-            android:paddingTop="19dp"
+            android:paddingTop="15dp"
             android:layout_gravity="center_horizontal|center_vertical"
             android:layout_toRightOf="@+id/left_arrow_message"
             android:text="Send Message"
             android:textAppearance="@style/dialog_title"/>
     </LinearLayout>
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/title"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingBottom="0dp"
-        android:layout_marginTop="50dp">
+        android:layout_marginTop="5dp">
+
         <LinearLayout
             android:id="@+id/from_layout"
             android:layout_marginTop="30dp"
@@ -54,6 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorPrimary"
+                android:inputType="textPersonName"
                 android:background="@drawable/message_border_line"
                 android:hint="From..." />
         </LinearLayout>
@@ -70,14 +81,40 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorPrimary"
                 android:background="@drawable/message_border_line"
-                android:hint="Subject..." />
+                android:inputType="textPersonName"
+                android:hint="Subject..."/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/urgent_layout"
+            android:layout_marginTop="30dp"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/subject_layout"
+            android:paddingLeft="2dp"
+            android:background="@drawable/message_border_line"
+            android:layout_marginBottom="8dp">
+            <TextView
+                android:id="@+id/urgent_message"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@+id/spinner"
+                android:text="Urgent:"
+                android:inputType="textPersonName"
+                android:textAppearance="@style/network_style"/>
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_toLeftOf="@+id/urgent_message">
+
+            </android.support.v7.widget.AppCompatSpinner>
         </LinearLayout>
         <LinearLayout
             android:id="@+id/input_layout"
             android:layout_marginTop="30dp"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:layout_below="@+id/subject_layout"
+            android:layout_below="@+id/urgent_layout"
             android:paddingLeft="2dp"
             android:layout_marginBottom="8dp">
             <EditText android:id="@+id/input_message"
@@ -136,5 +173,8 @@
                 android:text=""
                 android:textAppearance="@style/network_style"/>
         </LinearLayout>
-    </RelativeLayout>
+
+    </LinearLayout>
+    </LinearLayout>
+    </ScrollView>
 </RelativeLayout>
