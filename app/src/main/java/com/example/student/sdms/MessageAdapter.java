@@ -93,7 +93,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
         inflater.inflate(R.menu.popup_delete,optionsMenu.getMenu());
 
         holder.message.setText(mDataset.get(position).getMessage());
-        holder.author.setText(context.getResources().getString(R.string.author)+" "+mDataset.get(position).getAuthor());
+        holder.author.setText(mDataset.get(position).getAuthor());
         holder.date.setText(mDataset.get(position).getDate());
         holder.messageId.setText(""+mDataset.get(position).getMessageId());
         holder.subject.setText("Subject:\t"+mDataset.get(position).getSubject());

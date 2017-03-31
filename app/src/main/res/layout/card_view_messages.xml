@@ -4,6 +4,7 @@
     android:id="@+id/card_view_message"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
+    android:background="@drawable/card_bottom_line"
     android:layout_marginBottom="0dp"
     card_view:cardCornerRadius="0dp"
     card_view:cardElevation="1dp"
@@ -12,25 +13,29 @@
     card_view:contentPaddingRight="16dp"
     card_view:cardPreventCornerOverlap="false"
     card_view:theme="@style/AlertDialog.AppCompat"
-    android:layout_marginTop="-5dp">
+    android:layout_marginTop="5dp">
     <RelativeLayout
         android:id="@+id/messages"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:paddingBottom="1dp">
-        <LinearLayout
+        <FrameLayout
             android:id="@+id/title_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
+            android:gravity="center"
             android:paddingLeft="2dp"
-            android:elevation="4dp">
+            android:paddingBottom="2dp">
             <TextView
                 android:id="@+id/subject_message"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_toLeftOf="@+id/time_message"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:layout_alignParentLeft="true"
                 android:text="Subject:"
                 android:layout_weight="1"
@@ -39,13 +44,15 @@
             <TextView
                 android:id="@+id/time_message"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:gravity="center"
                 android:layout_toRightOf="@+id/info_text_message"
                 android:layout_alignParentRight="true"
                 android:textColor="@color/colorPrimary"
                 android:text="Time"/>
-        </LinearLayout>
-        <LinearLayout
+        </FrameLayout>
+        <FrameLayout
             android:id="@+id/message_layout_message"
             android:layout_marginTop="5dp"
             android:layout_below="@+id/title_message"
@@ -54,25 +61,26 @@
             android:paddingLeft="2dp">
             <TextView
                 android:id="@+id/message_message"
-                android:layout_width="500dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|left"
+                android:layout_gravity="left"
                 android:text=""
                 android:textColor="@color/colorPrimary"
-                android:layout_toLeftOf="@+id/delete_message"
+                android:layout_toLeftOf="@+id/urgent"
                 android:paddingRight="50dp"
                 android:maxLines="1"
                 android:ellipsize="end"/>
             <TextView
                 android:id="@+id/urgent"
                 android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginLeft="6dp"
+                 android:layout_height="20dp"
                 android:background="@drawable/notimportant"
                 android:layout_toRightOf="@+id/message_message"
-                android:layout_alignParentRight="true" />
-        </LinearLayout>
-        <LinearLayout
+                android:layout_gravity="end"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"/>
+        </FrameLayout>
+        <FrameLayout
             android:id="@+id/author_layout_message"
             android:layout_marginTop="10dp"
             android:layout_height="wrap_content"
@@ -81,10 +89,22 @@
             android:paddingLeft="2dp">
             android:layout_marginBottom="0dp">
             <TextView
-                android:layout_below="@+id/message_layout_message"
+                android:id="@+id/profilepic"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/profilepic"
+                android:layout_marginTop="2dp"
+                android:layout_toLeftOf="@+id/author_message"
+                android:layout_gravity="start"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"/>
+            <TextView
                 android:id="@+id/author_message"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
+                android:layout_marginLeft="30dp"
+                android:layout_alignParentRight="true"
+                android:layout_toRightOf="@+id/profilepic"
                 android:text=""
                 android:layout_weight="1"
                 android:textAppearance="@style/sender_style"/>
@@ -106,10 +126,10 @@
                 android:id="@+id/delete_message"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="2dp"
+                android:layout_gravity="end"
+                android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:src="@drawable/threedots"/>
-        </LinearLayout>
+        </FrameLayout>
     </RelativeLayout>
 </android.support.v7.widget.CardView>

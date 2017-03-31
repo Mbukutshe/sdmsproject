@@ -5,43 +5,51 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:layout_margin="0dp">
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_alignParentTop="true">
+        <LinearLayout
+            android:id="@+id/title_layout"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_alignParentTop="true"
+            android:background="@color/colorPrimary"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp"
+            android:elevation="2dp"
+            android:layout_marginBottom="20dp">
+            <ImageButton
+                android:id="@+id/left_arrow_message"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/leftarrow"
+                android:layout_toLeftOf="@+id/title_dialog"
+                android:layout_gravity="center_vertical"/>
+            <TextView
+                android:id="@+id/title_dialog"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:paddingTop="15dp"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:layout_toRightOf="@+id/left_arrow_message"
+                android:text="Send Message"
+                android:textAppearance="@style/dialog_title"/>
+        </LinearLayout>
+    </RelativeLayout>
     <ScrollView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:scrollbars="none">
+        android:scrollbars="none"
+        android:layout_below="@+id/header">
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-    <LinearLayout
-        android:id="@+id/title_layout"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_alignParentTop="true"
-        android:background="@color/colorPrimary"
-        android:paddingLeft="2dp"
-        android:paddingRight="2dp"
-        android:elevation="2dp"
-        android:layout_marginBottom="20dp">
-        <ImageButton
-            android:id="@+id/left_arrow_message"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginLeft="15dp"
-            android:background="@drawable/leftarrow"
-            android:layout_toLeftOf="@+id/title_dialog"
-            android:layout_gravity="center_vertical"/>
-        <TextView
-            android:id="@+id/title_dialog"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="20dp"
-            android:paddingTop="15dp"
-            android:layout_gravity="center_horizontal|center_vertical"
-            android:layout_toRightOf="@+id/left_arrow_message"
-            android:text="Send Message"
-            android:textAppearance="@style/dialog_title"/>
-    </LinearLayout>
+
     <LinearLayout
         android:id="@+id/title"
         android:orientation="vertical"
@@ -50,8 +58,7 @@
         android:layout_alignParentBottom="true"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:paddingBottom="0dp"
-        android:layout_marginTop="5dp">
+        android:paddingBottom="0dp">
 
         <LinearLayout
             android:id="@+id/from_layout"
@@ -60,13 +67,18 @@
             android:layout_width="match_parent"
             android:paddingLeft="2dp"
             android:layout_marginBottom="8dp">
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
             <EditText android:id="@+id/from_message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorPrimary"
                 android:inputType="textPersonName"
-                android:background="@drawable/message_border_line"
                 android:hint="From..." />
+            </android.support.design.widget.TextInputLayout>
         </LinearLayout>
         <LinearLayout
             android:id="@+id/subject_layout"
@@ -76,13 +88,18 @@
             android:layout_below="@+id/from_layout"
             android:paddingLeft="2dp"
             android:layout_marginBottom="8dp">
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
             <EditText android:id="@+id/subject_message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorPrimary"
-                android:background="@drawable/message_border_line"
                 android:inputType="textPersonName"
                 android:hint="Subject..."/>
+            </android.support.design.widget.TextInputLayout>
         </LinearLayout>
         <LinearLayout
             android:id="@+id/urgent_layout"
@@ -91,7 +108,6 @@
             android:layout_width="match_parent"
             android:layout_below="@+id/subject_layout"
             android:paddingLeft="2dp"
-            android:background="@drawable/message_border_line"
             android:layout_marginBottom="8dp">
             <TextView
                 android:id="@+id/urgent_message"
@@ -117,15 +133,20 @@
             android:layout_below="@+id/urgent_layout"
             android:paddingLeft="2dp"
             android:layout_marginBottom="8dp">
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
             <EditText android:id="@+id/input_message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorPrimary"
-                android:background="@drawable/message_border_line"
                 android:breakStrategy="balanced"
                 android:inputType="textMultiLine"
                 android:minLines="0"
                 android:hint="Type your message..." />
+            </android.support.design.widget.TextInputLayout>
         </LinearLayout>
         <LinearLayout
             android:id="@+id/footer"
@@ -145,35 +166,33 @@
                 android:textColor="@drawable/button_selector"
                 android:background="@drawable/button_background"/>
         </LinearLayout>
-        <LinearLayout
+        <FrameLayout
             android:id="@+id/title_network"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:background="#F4F4F4"
             android:paddingLeft="200dp"
             android:paddingTop="0dp"
-            android:paddingRight="2dp"
+            android:padding="2dp"
+            android:gravity="center"
             android:layout_marginBottom="0dp">
-            <ImageButton
+            <ImageView
                 android:id="@+id/offline_message"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginTop="5dp"
-                android:background="#f4f4f4"
                 android:layout_toLeftOf="@+id/network_state"
-                android:gravity="center"/>
+                android:layout_gravity="center"/>
             <TextView
                 android:id="@+id/network_state_message"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:paddingBottom="15dp"
                 android:layout_marginLeft="10dp"
-                android:gravity="center"
+                android:layout_gravity="center"
                 android:text=""
                 android:textAppearance="@style/network_style"/>
-        </LinearLayout>
-
+        </FrameLayout>
     </LinearLayout>
     </LinearLayout>
     </ScrollView>

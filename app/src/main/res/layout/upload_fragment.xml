@@ -5,45 +5,52 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:layout_margin="0dp">
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_alignParentTop="true">
+        <LinearLayout
+            android:id="@+id/title_layout"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_alignParentTop="true"
+            android:background="@color/colorPrimary"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp"
+            android:elevation="4dp"
+            android:layout_marginBottom="10dp">
+            <ImageButton
+                android:id="@+id/left_arrow"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/leftarrow"
+                android:layout_toLeftOf="@+id/title_dialog"
+                android:layout_gravity="center_vertical"/>
+            <TextView
+                android:id="@+id/title_dialog"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:paddingTop="19dp"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:layout_toRightOf="@+id/left_arrow"
+                android:text="Upload Document"
+                android:textAppearance="@style/dialog_title"/>
+        </LinearLayout>
+    </RelativeLayout>
     <ScrollView
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:scrollbars="none"
-        android:layout_alignParentTop="true">
+        android:layout_below="@+id/header">
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true">
-    <LinearLayout
-        android:id="@+id/title_layout"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_alignParentTop="true"
-        android:background="@color/colorPrimary"
-        android:paddingLeft="2dp"
-        android:paddingRight="2dp"
-        android:elevation="4dp"
-        android:layout_marginBottom="10dp">
-        <ImageButton
-            android:id="@+id/left_arrow"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginLeft="15dp"
-            android:background="@drawable/leftarrow"
-            android:layout_toLeftOf="@+id/title_dialog"
-            android:layout_gravity="center_vertical"/>
-        <TextView
-            android:id="@+id/title_dialog"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="20dp"
-            android:paddingTop="19dp"
-            android:layout_gravity="center_horizontal|center_vertical"
-            android:layout_toRightOf="@+id/left_arrow"
-            android:text="Upload Document"
-            android:textAppearance="@style/dialog_title"/>
-    </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/title_"
@@ -53,8 +60,7 @@
         android:layout_alignParentBottom="true"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:paddingBottom="0dp"
-        android:layout_marginTop="5dp">
+        android:paddingBottom="0dp">
 
         <LinearLayout
             android:id="@+id/sender_layout"
@@ -63,13 +69,18 @@
             android:layout_width="match_parent"
             android:paddingLeft="2dp"
             android:layout_marginBottom="8dp">
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
             <EditText android:id="@+id/sender_doc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorPrimary"
                 android:inputType="textPersonName"
-                android:background="@drawable/message_border_line"
                 android:hint="Sender..." />
+            </android.support.design.widget.TextInputLayout>
         </LinearLayout>
         <LinearLayout
             android:id="@+id/doc_title_layout"
@@ -78,13 +89,18 @@
             android:layout_width="match_parent"
             android:paddingLeft="2dp"
             android:layout_marginBottom="8dp">
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
             <EditText android:id="@+id/title_doc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorPrimary"
                 android:inputType="textPersonName"
-                android:background="@drawable/message_border_line"
                 android:hint="title..." />
+            </android.support.design.widget.TextInputLayout>
         </LinearLayout>
         <LinearLayout
             android:id="@+id/desc_layout"
@@ -93,13 +109,18 @@
             android:layout_width="match_parent"
             android:paddingLeft="2dp"
             android:layout_marginBottom="8dp">
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
             <EditText android:id="@+id/desc_doc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorPrimary"
                 android:inputType="textPersonName"
-                android:background="@drawable/message_border_line"
                 android:hint="description..."/>
+            </android.support.design.widget.TextInputLayout>
         </LinearLayout>
         <LinearLayout
             android:id="@+id/author_layout"
@@ -108,7 +129,6 @@
             android:layout_width="match_parent"
             android:layout_below="@+id/message_layout"
             android:paddingLeft="2dp"
-            android:background="@drawable/dotted_line"
             android:layout_marginBottom="4dp">
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn_choose"
@@ -122,7 +142,9 @@
             <TextView
                 android:id="@+id/title_choose"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingLeft="10dp"
                 android:layout_toRightOf="@+id/btn_choose"
                 android:text="No file chosen"
                 android:textAppearance="@drawable/dotted_line_selector"/>
@@ -145,34 +167,33 @@
                 android:textColor="@drawable/button_selector"
                 android:background="@drawable/button_background"/>
         </LinearLayout>
-        <LinearLayout
+        <FrameLayout
             android:id="@+id/title_network"
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_alignParentBottom="true"
-            android:background="#F4F4F4"
             android:paddingLeft="150dp"
+            android:gravity="center"
             android:paddingTop="15dp"
-            android:paddingRight="2dp"
+            android:padding="2dp"
             android:layout_marginBottom="0dp">
-            <ImageButton
+            <ImageView
                 android:id="@+id/offline"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginTop="5dp"
-                android:background="#f4f4f4"
                 android:layout_toLeftOf="@+id/network_state"
-                android:gravity="center"/>
+                android:layout_gravity="center"/>
             <TextView
                 android:id="@+id/network_state"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:paddingBottom="15dp"
                 android:layout_marginLeft="10dp"
-                android:gravity="center"
+                android:layout_gravity="center"
                 android:text=""
                 android:textAppearance="@style/network_style"/>
-        </LinearLayout>
+        </FrameLayout>
     </LinearLayout>
     </LinearLayout>
     </ScrollView>

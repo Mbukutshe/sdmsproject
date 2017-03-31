@@ -15,6 +15,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.SyncStateContract;
 import android.support.annotation.Nullable;
@@ -112,7 +113,7 @@ public class MainActivity extends AppCompatActivity
     private static boolean active=true;
     public static boolean messageActive=true;
     public static Context context;
-
+    static int size=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -121,12 +122,10 @@ public class MainActivity extends AppCompatActivity
 
         menus =menu;
         context = getApplicationContext();
-        MobileAds.initialize(getApplicationContext(),getString(R.string.ads_unit_id));
-        AdView adView=(AdView)findViewById(R.id.addView);
 
 
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Messages");
@@ -141,6 +140,12 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView.setAdapter(mAdapter);
 
         int size = mAdapter.getItemCount();
+        if(size==4) {
+            MobileAds.initialize(getApplicationContext(), getString(R.string.ads_unit_id));
+            AdView adView = (AdView) findViewById(R.id.addView);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            adView.loadAd(adRequest);
+        }
         SqliteController controller = new SqliteController(this);
 
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -268,16 +273,9 @@ public class MainActivity extends AppCompatActivity
         final FragmentManager fragmentManager = getSupportFragmentManager();
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         if (id == R.id.nav_about) {
-            getSupportActionBar().setTitle("Website");
-            fragmentManager.beginTransaction().replace(R.id.content_main,new about()).commit();
-            fab.setImageDrawable(ContextCompat.getDrawable(getBaseContext(),R.drawable.feedback));
-
-            MenuItem documentOption = menu.findItem(R.id.action_download);
-            documentOption.setVisible(false);
-
-            MenuItem messageOption = menu.findItem(R.id.action_messages);
-            messageOption.setVisible(false);
-            messageActive =false;
+            Uri uri = Uri.parse("http://www.plattdriveprimary.co.za/");
+            Intent browser = new Intent(Intent.ACTION_VIEW,uri);
+            startActivity(browser);
         }
         else if (id == R.id.nav_home) {
 
@@ -314,16 +312,9 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_contacts) {
 
-            getSupportActionBar().setTitle("Contacts");
-            fragmentManager.beginTransaction().replace(R.id.content_main,new contacts()).commit();
-            fab.setImageDrawable(ContextCompat.getDrawable(getBaseContext(),R.drawable.feedback));
-
-            MenuItem documentOption = menu.findItem(R.id.action_download);
-            documentOption.setVisible(true);
-
-            MenuItem messageOption = menu.findItem(R.id.action_messages);
-            messageOption.setVisible(true);
-            messageActive =false;
+            Uri uri = Uri.parse("http://dms.plattdriveprimary.co.za/");
+            Intent browser = new Intent(Intent.ACTION_VIEW,uri);
+            startActivity(browser);
 
         } else if (id == R.id.nav_help) {
 
@@ -364,9 +355,13 @@ public class MainActivity extends AppCompatActivity
                         anim.start();
                         dialog.setContentView(R.layout.upload_fragment);
                         choose = (TextView)dialog.findViewById(R.id.title_choose);
+                        AppCompatButton btnChoose = (AppCompatButton)dialog.findViewById(R.id.btn_choose);
                         messageText = (TextView)dialog.findViewById(R.id.network_state);
                         networkState = (TextView)dialog.findViewById(R.id.network_state);
-                        choose.setOnClickListener(new View.OnClickListener() {
+                        final EditText sender = (EditText)dialog.findViewById(R.id.sender_doc);
+                        final EditText title = (EditText)dialog.findViewById(R.id.title_doc);
+                        final EditText desc = (EditText)dialog.findViewById(R.id.desc_doc);
+                        btnChoose.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
                                 Intent intent = new Intent();
@@ -404,14 +399,14 @@ public class MainActivity extends AppCompatActivity
                                                 }
                                             });
 
-                                            uploadFile(uploadFilePath);
+                                            uploadFile(uploadFilePath,sender.getText().toString(),title.getText().toString(),desc.getText().toString());
 
                                         }
                                     }).start();
                                 }
                                 else
                                 {
-                                    ImageButton network = (ImageButton)dialog.findViewById(R.id.offline);
+                                    ImageView network = (ImageView)dialog.findViewById(R.id.offline);
                                     network.setBackgroundResource(R.drawable.offline);
                                     networkState.setText("No internet connection!");
                                     textAnim.setDuration(50);
@@ -563,7 +558,7 @@ public class MainActivity extends AppCompatActivity
                                 }
                                 else
                                 {
-                                    ImageButton network = (ImageButton)dialog.findViewById(R.id.offline_message);
+                                    ImageView network = (ImageView)dialog.findViewById(R.id.offline_message);
                                     network.setBackgroundResource(R.drawable.offline);
                                     offline.setText("No internet Connection!");
                                     textAnim.setDuration(50);
@@ -678,7 +673,7 @@ public class MainActivity extends AppCompatActivity
 
         }
     }
-    public int uploadFile(String sourceFileUri) {
+    public int uploadFile(String sourceFileUri,String sender,String title,String desc) {
 
 
         String fileName = sourceFileUri;
@@ -691,7 +686,7 @@ public class MainActivity extends AppCompatActivity
         int bytesRead, bytesAvailable, bufferSize;
         byte[] buffer;
         int maxBufferSize = 1 * 1024 * 1024;
-        File sourceFile = new File(sourceFileUri);
+       /* File sourceFile = new File(Environment.getDataDirectory().getAbsolutePath(),sourceFileUri);
 
         if (!sourceFile.isFile()) {
 
@@ -710,11 +705,11 @@ public class MainActivity extends AppCompatActivity
 
         }
         else
-        {
+        {*/
             try {
 
                 // open a URL connection to the Servlet
-                FileInputStream fileInputStream = new FileInputStream(sourceFile);
+                FileInputStream fileInputStream = new FileInputStream(new File(sourceFileUri));
                 URL url = new URL(upLoadServerUri);
 
                 // Open a HTTP  connection to  the URL
@@ -731,10 +726,10 @@ public class MainActivity extends AppCompatActivity
                 dos = new DataOutputStream(conn.getOutputStream());
 
                 dos.writeBytes(twoHyphens + boundary + lineEnd);
-                dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""
+                dos.writeBytes("Content-Disposition: form-data; sender=\"sender\"; title=\"title\"; desc=\"desc\"; name=\"uploaded_file\";filename=\""
                                 + fileName + "\"" + lineEnd);
 
-                        dos.writeBytes(lineEnd);
+                dos.writeBytes(lineEnd);
 
                 // create a buffer of  maximum size
                 bytesAvailable = fileInputStream.available();
@@ -814,7 +809,7 @@ public class MainActivity extends AppCompatActivity
             return serverResponseCode;
 
         } // End else block
-    }
+    //}
     public static boolean isAppActive()
     {
         return active;
