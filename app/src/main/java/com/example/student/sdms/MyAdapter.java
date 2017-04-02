@@ -103,7 +103,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         holder.subject.setText("Subject:\t"+mDataset.get(position).getSubject());
         holder.link.setText(mDataset.get(position).getLink());
         holder.filename.setText(mDataset.get(position).getLink());
-        holder.author.setText("by:\t"+mDataset.get(position).getAuthor());
+        holder.author.setText("\t"+mDataset.get(position).getAuthor());
         holder.date.setText(mDataset.get(position).getDate());
         holder.messageId.setText(""+mDataset.get(position).getMessageId());
 
@@ -126,6 +126,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                 TextView messageId = (TextView)dialog.findViewById(R.id.docId);
 
                 ImageView back = (ImageView)dialog.findViewById(R.id.left_arrow);
+
                 back.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -178,11 +179,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                             request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE | DownloadManager.Request.NETWORK_WIFI);
                             request.setAllowedOverRoaming(false);
                             request.setTitle(holder.filename.getText().toString());
+                            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, holder.filename.getText().toString());
                             request.setDescription("downloading ..... " + holder.filename.getText().toString());
                             request.setVisibleInDownloadsUi(true);
                             long id = dm.enqueue(request);
-                            prefs.edit().putLong(DL_ID, id).commit();
+                           prefs.edit().putLong(DL_ID, id).commit();
                             context.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
                         }
                         else
@@ -191,7 +193,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                             View layout =infla.inflate(R.layout.toast_container_layout,(ViewGroup)holder.itemView.findViewById(R.id.toast_layout));
                             TextView textview = (TextView)layout.findViewById(R.id.toast_message);
                             layout.setBackgroundResource(R.color.toastColor);
-                            textview.setText("No internet connection. Please check internet settings or the strength isn't good enough.");
+                            textview.setText("No internet connection.");
                             Toast toast = new Toast(context);
                             toast.setGravity(Gravity.CENTER_VERTICAL,0,0);
                             toast.setDuration(Toast.LENGTH_LONG);
@@ -222,7 +224,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            //queryDownloadStatus();
+            queryDownloadStatus();
         }
     };
     public void removeItem(int position)
@@ -230,6 +232,37 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         mDataset.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position,mDataset.size());
+    }
+    private void queryDownloadStatus() {
+        DownloadManager.Query query = new DownloadManager.Query();
+        query.setFilterById(prefs.getLong(DL_ID, 0));
+        Cursor c = dm.query(query);
+        if(c.moveToFirst()) {
+            int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
+            Log.d("DM Sample","Status Check: "+status);
+            switch(status) {
+                case DownloadManager.STATUS_PAUSED:
+                case DownloadManager.STATUS_PENDING:
+                case DownloadManager.STATUS_RUNNING:
+                    Toast.makeText(context,"Running",Toast.LENGTH_LONG);
+                    break;
+                case DownloadManager.STATUS_SUCCESSFUL:
+                    try {
+                        ParcelFileDescriptor file = dm.openDownloadedFile(prefs.getLong(DL_ID, 0));
+                        FileInputStream fis = new ParcelFileDescriptor.AutoCloseInputStream(file);
+                        //imageView.setImageBitmap(BitmapFactory.decodeStream(fis));
+                        Toast.makeText(context,"download complete",Toast.LENGTH_LONG);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case DownloadManager.STATUS_FAILED:
+                    Toast.makeText(context,"Failed",Toast.LENGTH_LONG);
+                    dm.remove(prefs.getLong(DL_ID, 0));
+                    prefs.edit().clear().commit();
+                    break;
+            }
+        }
     }
 
 }

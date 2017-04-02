@@ -14,12 +14,9 @@
                 android:endColor="@color/colorPrimary"/>
             <stroke
                 android:width="2dp"
-                android:color="@color/colorPrimary"
-                android:dashGap="4dp"
-                android:dashWidth="2dp"/>
+                android:color="@color/colorPrimary"/>
             <solid
                 android:color="@color/colorPrimary"/>
-            <corners android:bottomRightRadius="4dp" />
         </shape>
 
 

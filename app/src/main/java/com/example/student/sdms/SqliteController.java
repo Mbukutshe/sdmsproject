@@ -39,7 +39,7 @@ public class SqliteController extends SQLiteOpenHelper
     {
         Log.d(LOGCAT,"insert");
         SQLiteDatabase database = this.getWritableDatabase();
-        String query = "INSERT INTO Messages (messageId,message,subject,link,author,date,filename) VALUES("+messageId+",'"+message+"','"+subject+"', '"+link+"','"+author+"','"+date+"','"+filename+"')";
+        String query = "INSERT INTO Messages (messageId,message,subject,link,author,date,filename) VALUES("+messageId+",'"+message+"','"+subject+"', '"+link+"','"+author+"','"+date+"','"+filename+"');";
         Log.d("query",query);
         database.execSQL(query);
         database.close();
@@ -76,6 +76,7 @@ public class SqliteController extends SQLiteOpenHelper
         String []columns = {"messageId","message","subject","link","author","date","filename"};
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.query("Messages",columns, null,null,null,null,"date DESC");
+
         return cursor;
     }
     public Cursor getAllMessage()

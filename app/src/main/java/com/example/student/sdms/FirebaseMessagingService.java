@@ -42,16 +42,12 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             controller.insertMessag(messageId, message,author,date,urgent,subject);
             if(MainActivity.isAppActive())
             {
-                //MainActivity.newMessage();
 
-                List<ItemObject> myDataset = getAllItemList();
-                MessageAdapter adapter = new MessageAdapter(getApplicationContext(),myDataset);
-                adapter.addItem(myDataset);
-                showNotification(message,"Platt Drive App",true);
+                showNotification(message,"Platt Drive App",true,"message");
             }
             else
             {
-                showNotification(message,"Platt Drive App",true);
+                showNotification(message,"Platt Drive App",true,"message");
             }
 
         }
@@ -66,7 +62,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 String date = remoteMessage.getData().get("date");
                 String filename = remoteMessage.getData().get("filename");
                 controller.insertMessage(messageId,message,subject,author,link,date,filename);
-                showNotification(message, "Platt Drive App",false);
+                showNotification(message, "Platt Drive App",false,"document");
             }
         try
         {
@@ -77,7 +73,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             e.printStackTrace();
         }
     }
-    private void showNotification(String message,String subject,boolean isMessage)
+    private void showNotification(String message,String subject,boolean isMessage,String type)
     {
 
         if(MainActivity.isAppActive() && isMessage)
@@ -90,9 +86,9 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             manager.notify(0,builder.build());
         }
         else
-            if(MainActivity.isAppActive() && !isMessage)
+            if(MainActivity.isAppActive() && !isMessage && type.equals("document"))
             {
-                Intent in = new Intent(this,SplashScreen.class);
+                Intent in = new Intent(this,MainActivity.class);
                 in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 PendingIntent pendingIntent = PendingIntent.getActivity(this,0,in,PendingIntent.FLAG_UPDATE_CURRENT);
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setAutoCancel(true).setContentTitle(subject).setContentText(message).setSmallIcon(R.drawable.llogo).setContentIntent(pendingIntent);
@@ -101,7 +97,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             }
             else
             {
-                Intent in = new Intent(this,downloads.class);
+                Intent in = new Intent(this,SplashScreen.class);
                 in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 PendingIntent pendingIntent = PendingIntent.getActivity(this,0,in,PendingIntent.FLAG_UPDATE_CURRENT);
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setAutoCancel(true).setContentTitle(subject).setContentText(message).setSmallIcon(R.drawable.llogo).setContentIntent(pendingIntent);
@@ -109,19 +105,5 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 manager.notify(0,builder.build());
             }
     }
-    private List<ItemObject> getAllItemList(){
 
-
-        List<ItemObject> allItems = new ArrayList<>();
-        Cursor data = new SqliteController(this).getAllMessage();
-        if(data.moveToFirst())
-        {
-            do
-            {
-                allItems.add(new ItemObject(data.getInt(0),data.getString(1),data.getString(4),"",data.getString(2),data.getString(3),"",data.getString(5)));
-            }
-            while(data.moveToNext());
-        }
-        return allItems;
-    }
 }

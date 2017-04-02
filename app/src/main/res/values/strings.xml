@@ -4,15 +4,10 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
     <string name="ads_unit_id"> ca-app-pub-4346858439090798/2246800263/</string>
-    <string name="app_ads_unit_id"> ca-app-pub-4346858439090798~9770067069</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="author">By:</string>
 
-    <string name="about">PlattDrive App Version 1.0 Accomodates All Parties of A School.</string>
     <string-array name ="urgent">
         <item>Yes</item>
         <item>No</item>

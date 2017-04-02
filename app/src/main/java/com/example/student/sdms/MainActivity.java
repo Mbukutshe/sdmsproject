@@ -56,9 +56,13 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 
 import java.io.FileInputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -70,12 +74,15 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.NameValue;
 import net.gotev.uploadservice.UploadNotificationConfig;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -89,6 +96,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.ads.formats.NativeAdOptions;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
     FragmentManager fragmentManager = getSupportFragmentManager();
@@ -108,7 +117,7 @@ public class MainActivity extends AppCompatActivity
     String upLoadServerUri = "http://dms.plattdriveprimary.co.za/simpleupload.php";
     public static String uploadFilePath="";
     public static String uploadFileName="";
-    private final String UPLOAD_URL="http://sdms.portfolioonline.co.za/upload.php";
+    private final String UPLOAD_URL="http://sdms.portfolioonline.co.za/simpleupload.php";
     RequestQueue requestQueue;
     private static boolean active=true;
     public static boolean messageActive=true;
@@ -122,10 +131,6 @@ public class MainActivity extends AppCompatActivity
 
         menus =menu;
         context = getApplicationContext();
-
-
-
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Messages");
@@ -140,12 +145,12 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView.setAdapter(mAdapter);
 
         int size = mAdapter.getItemCount();
-        if(size==4) {
-            MobileAds.initialize(getApplicationContext(), getString(R.string.ads_unit_id));
-            AdView adView = (AdView) findViewById(R.id.addView);
-            AdRequest adRequest = new AdRequest.Builder().build();
-            adView.loadAd(adRequest);
-        }
+
+        MobileAds.initialize(getApplicationContext(), getString(R.string.ads_unit_id));
+        AdView adView = (AdView) findViewById(R.id.addView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
+
         SqliteController controller = new SqliteController(this);
 
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -333,103 +338,140 @@ public class MainActivity extends AppCompatActivity
             dialog.setCanceledOnTouchOutside(false);
             dialog.setContentView(R.layout.login);
            final AppCompatButton login = (AppCompatButton)dialog.findViewById(R.id.btn_login);
-           final ValueAnimator anim = new ValueAnimator();
-            anim.setIntValues(Color.parseColor("#FFFFFF"),Color.parseColor("#00FF00"));
-            anim.setEvaluator(new ArgbEvaluator());
-            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    login.setBackgroundColor((Integer)valueAnimator.getAnimatedValue());
-                }
-            });
+
             login.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     EditText username = (EditText)dialog.findViewById(R.id.input_username);
                     EditText password = (EditText)dialog.findViewById(R.id.input_password);
-                    String user=username.getText().toString();
-                    String pass=password.getText().toString();
-                    if(user.equalsIgnoreCase("wiseman") && pass.equalsIgnoreCase("Khanyisa18"))
-                    {
-                        anim.setDuration(100);
-                        anim.start();
-                        dialog.setContentView(R.layout.upload_fragment);
-                        choose = (TextView)dialog.findViewById(R.id.title_choose);
-                        AppCompatButton btnChoose = (AppCompatButton)dialog.findViewById(R.id.btn_choose);
-                        messageText = (TextView)dialog.findViewById(R.id.network_state);
-                        networkState = (TextView)dialog.findViewById(R.id.network_state);
-                        final EditText sender = (EditText)dialog.findViewById(R.id.sender_doc);
-                        final EditText title = (EditText)dialog.findViewById(R.id.title_doc);
-                        final EditText desc = (EditText)dialog.findViewById(R.id.desc_doc);
-                        btnChoose.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Intent intent = new Intent();
-                                intent.setType("*/*");
-                                intent.setAction(Intent.ACTION_GET_CONTENT);
-                                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                                startActivityForResult(Intent.createChooser(intent,"Select document"),1);
+                    final String user=username.getText().toString();
+                    final String pass=password.getText().toString();
 
-                            }
-                        });
-                        ImageButton back = (ImageButton)dialog.findViewById(R.id.left_arrow);
-                        back.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                dialog.dismiss();
-                            }
-                        });
-                        AppCompatButton upload =(AppCompatButton)dialog.findViewById(R.id.btn_upload);
-                        upload.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-                                NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-                                boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-                                if (isConnected)
-                                {
-                                    uploadMultipart();
-                                    dialogprogress = ProgressDialog.show(dialog.getContext(), "", "Uploading file...", true);
+                    final String insertUrl = "http://dms.plattdriveprimary.co.za/androidlogin.php";
 
-                                    new Thread(new Runnable() {
-                                        public void run() {
-                                            runOnUiThread(new Runnable() {
+                    dialogprogress = ProgressDialog.show(dialog.getContext(), "", "Authenticating...", true);
+
+                    new Thread(new Runnable() {
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+
+                                }
+                            });
+
+
+                        }
+                    }).start();
+                    StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            dialogprogress.dismiss();
+                            if(response.equalsIgnoreCase("success"))
+                            {
+                                dialog.setContentView(R.layout.upload_fragment);
+                                choose = (TextView)dialog.findViewById(R.id.title_choose);
+                                AppCompatButton btnChoose = (AppCompatButton)dialog.findViewById(R.id.btn_choose);
+                                messageText = (TextView)dialog.findViewById(R.id.network_state);
+                                networkState = (TextView)dialog.findViewById(R.id.network_state);
+                                final EditText sender = (EditText)dialog.findViewById(R.id.sender_doc);
+                                final EditText title = (EditText)dialog.findViewById(R.id.title_doc);
+                                final EditText desc = (EditText)dialog.findViewById(R.id.desc_doc);
+
+                                btnChoose.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent();
+                                        intent.setType("*/*");
+                                        intent.setAction(Intent.ACTION_GET_CONTENT);
+                                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                                        startActivityForResult(Intent.createChooser(intent,"Select document"),1);
+
+                                    }
+                                });
+                                ImageButton back = (ImageButton)dialog.findViewById(R.id.left_arrow);
+                                back.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                AppCompatButton upload =(AppCompatButton)dialog.findViewById(R.id.btn_upload);
+                                upload.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                                        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+                                        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+                                        if (isConnected)
+                                        {
+                                            uploadMultipart();
+                                            dialogprogress = ProgressDialog.show(dialog.getContext(), "", "Uploading file...", true);
+
+                                            new Thread(new Runnable() {
                                                 public void run() {
-                                                    messageText.setText("uploading started.....");
-                                                }
-                                            });
+                                                    runOnUiThread(new Runnable() {
+                                                        public void run() {
+                                                            messageText.setText("uploading started.....");
+                                                        }
+                                                    });
 
-                                            uploadFile(uploadFilePath,sender.getText().toString(),title.getText().toString(),desc.getText().toString());
+                                                    uploadFile(uploadFilePath,sender.getText().toString(),title.getText().toString(),desc.getText().toString());
+                                                }
+                                            }).start();
 
                                         }
-                                    }).start();
-                                }
-                                else
-                                {
-                                    ImageView network = (ImageView)dialog.findViewById(R.id.offline);
-                                    network.setBackgroundResource(R.drawable.offline);
-                                    networkState.setText("No internet connection!");
-                                    textAnim.setDuration(50);
-                                    textAnim.setStartOffset(20);
-                                    textAnim.setRepeatMode(Animation.REVERSE);
-                                    textAnim.setRepeatCount(3);
-                                    network.startAnimation(textAnim);
-                                    networkState.startAnimation(textAnim);
-                                }
+                                        else
+                                        {
+                                            ImageView network = (ImageView)dialog.findViewById(R.id.offline);
+                                            network.setBackgroundResource(R.drawable.offline);
+                                            networkState.setText("No internet connection!");
+                                            textAnim.setDuration(50);
+                                            textAnim.setStartOffset(20);
+                                            textAnim.setRepeatMode(Animation.REVERSE);
+                                            textAnim.setRepeatCount(3);
+                                            network.startAnimation(textAnim);
+                                            networkState.startAnimation(textAnim);
+                                        }
 
+                                    }
+                                });
                             }
-                        });
-                    }
-                    else
-                    {
-                        TextView textView = (TextView)dialog.findViewById(R.id.error);
-                        textView.setText("Incorrect Username or Password. Please try again or later!");
-                        textAnim.setDuration(50);
-                        textAnim.setStartOffset(20);
-                        textAnim.setRepeatMode(Animation.REVERSE);
-                        textAnim.setRepeatCount(3);
-                        textView.startAnimation(textAnim);
-                    }
+                            else
+                            {
+                                TextView textView = (TextView)dialog.findViewById(R.id.error);
+                                textView.setText("Oops!!, Incorrect Username or Password.");
+                                textAnim.setDuration(50);
+                                textAnim.setStartOffset(20);
+                                textAnim.setRepeatMode(Animation.REVERSE);
+                                textAnim.setRepeatCount(3);
+                                textView.startAnimation(textAnim);
+                            }
+
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                            textAnim.setDuration(50);
+                            textAnim.setStartOffset(20);
+                            textAnim.setRepeatMode(Animation.REVERSE);
+                            textAnim.setRepeatCount(3);
+
+                        }
+
+                    }) {
+                        @Override
+                        protected Map<String, String> getParams() {
+                            Map<String, String> parameters = new HashMap<String, String>();
+                            parameters.put("username", user);
+                            parameters.put("password", pass);
+                            return parameters;
+                        }
+                    };
+                    request.setRetryPolicy(new DefaultRetryPolicy(0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                    requestQueue = Volley.newRequestQueue(getApplicationContext());
+                    requestQueue.add(request);
+
                 }
             });
             dialog.show();
@@ -443,145 +485,173 @@ public class MainActivity extends AppCompatActivity
             dialog.setCanceledOnTouchOutside(false);
 
             final AppCompatButton login = (AppCompatButton)dialog.findViewById(R.id.btn_login);
-            final ValueAnimator anim = new ValueAnimator();
-            anim.setIntValues(Color.parseColor("#FFFFFF"),Color.parseColor("#00FF00"));
-            anim.setEvaluator(new ArgbEvaluator());
-            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    login.setBackgroundColor((Integer)valueAnimator.getAnimatedValue());
-                }
-            });
             login.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(final View view) {
                     EditText username = (EditText)dialog.findViewById(R.id.input_username);
                     EditText password = (EditText)dialog.findViewById(R.id.input_password);
-                    String user=username.getText().toString();
-                    String pass=password.getText().toString();
+                    final String user=username.getText().toString();
+                    final String pass=password.getText().toString();
+                    final String insertUrl = "http://dms.plattdriveprimary.co.za/androidlogin.php";
+                    final TextView textView = (TextView)dialog.findViewById(R.id.error);
+                    dialogprogress = ProgressDialog.show(dialog.getContext(), "", "Authenticating...", true);
 
-                    if(user.equals("Wiseman") && pass.equals("Khanyisa18"))
+                    new Thread(new Runnable() {
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+
+                                }
+                            });
+
+                        }
+                    }).start();
+                    StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>()
                     {
-                        anim.setDuration(50);
-                        anim.start();
-                        dialog.setContentView(R.layout.send_fragment);
-                        ImageButton back = (ImageButton)dialog.findViewById(R.id.left_arrow_message);
-                        back.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                dialog.dismiss();
-                            }
-                        });
-                        Spinner spinner = (Spinner)dialog.findViewById(R.id.spinner);
-                        ArrayAdapter<CharSequence>adapter = ArrayAdapter.createFromResource(dialog.getContext(),R.array.urgent,android.R.layout.simple_spinner_item);
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        spinner.setAdapter(adapter);
-                        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                            @Override
-                            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                                urgent = adapterView.getItemAtPosition(i).toString();
-                            }
+                        @Override
+                        public void onResponse(String response) {
+                            dialogprogress.dismiss();
+                            if (response.equalsIgnoreCase("success")) {
+                                dialog.setContentView(R.layout.send_fragment);
+                                ImageButton back = (ImageButton) dialog.findViewById(R.id.left_arrow_message);
+                                back.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                Spinner spinner = (Spinner) dialog.findViewById(R.id.spinner);
+                                ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(dialog.getContext(), R.array.urgent, android.R.layout.simple_spinner_item);
+                                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                spinner.setAdapter(adapter);
+                                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                    @Override
+                                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                                        urgent = adapterView.getItemAtPosition(i).toString();
+                                    }
 
-                            @Override
-                            public void onNothingSelected(AdapterView<?> adapterView) {
-                                urgent = adapterView.getItemAtPosition(0).toString();
-                            }
-                        });
-                        final TextView offline = (TextView)dialog.findViewById(R.id.network_state_message);
-                        final EditText messageMessage =(EditText)dialog.findViewById(R.id.input_message);
-                        final EditText fromMessage =(EditText)dialog.findViewById(R.id.from_message);
-                        final  EditText subjectMessage =(EditText)dialog.findViewById(R.id.subject_message);
-                        AppCompatButton send = (AppCompatButton)dialog.findViewById(R.id.btn_send);
+                                    @Override
+                                    public void onNothingSelected(AdapterView<?> adapterView) {
+                                        urgent = adapterView.getItemAtPosition(0).toString();
+                                    }
+                                });
+                                final TextView offline = (TextView) dialog.findViewById(R.id.network_state_message);
+                                final EditText messageMessage = (EditText) dialog.findViewById(R.id.input_message);
+                                final EditText fromMessage = (EditText) dialog.findViewById(R.id.from_message);
+                                final EditText subjectMessage = (EditText) dialog.findViewById(R.id.subject_message);
+                                AppCompatButton send = (AppCompatButton) dialog.findViewById(R.id.btn_send);
 
-                        send.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
+                                send.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
 
-                                ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-                                NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-                                boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-                                if(isConnected)
-                                {
+                                        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                                        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+                                        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+                                        if (isConnected) {
 
-                                    final String insertUrl = "http://dms.plattdriveprimary.co.za/sendmessage.php";
-                                    final String from,subject,message;
-                                    from = fromMessage.getText().toString();
-                                    subject = subjectMessage.getText().toString();
-                                    message = messageMessage.getText().toString();
-                                    dialogprogress = ProgressDialog.show(dialog.getContext(), "", "Sending message...", true);
+                                            final String insertUrl = "http://dms.plattdriveprimary.co.za/sendmessage.php";
+                                            final String from, subject, message;
+                                            from = fromMessage.getText().toString();
+                                            subject = subjectMessage.getText().toString();
+                                            message = messageMessage.getText().toString();
+                                            dialogprogress = ProgressDialog.show(dialog.getContext(), "", "Sending message...", true);
 
-                                    new Thread(new Runnable() {
-                                        public void run() {
-                                            runOnUiThread(new Runnable() {
+                                            new Thread(new Runnable() {
                                                 public void run() {
+                                                    runOnUiThread(new Runnable() {
+                                                        public void run() {
+
+                                                        }
+                                                    });
+
 
                                                 }
-                                            });
+                                            }).start();
+                                            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+                                                @Override
+                                                public void onResponse(String response) {
+                                                    dialogprogress.dismiss();
+                                                    offline.setText("Message has been sent!");
 
+                                                }
+                                            }, new Response.ErrorListener() {
+                                                @Override
+                                                public void onErrorResponse(VolleyError error) {
+                                                    offline.setText("error while sending a message!");
+                                                    textAnim.setDuration(50);
+                                                    textAnim.setStartOffset(20);
+                                                    textAnim.setRepeatMode(Animation.REVERSE);
+                                                    textAnim.setRepeatCount(3);
+                                                    offline.startAnimation(textAnim);
+                                                }
 
-                                        }
-                                    }).start();
-                                    StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>()
-                                    {
-                                        @Override
-                                        public void onResponse(String response) {
-                                            dialogprogress.dismiss();
-                                            offline.setText("Message has been sent!");
+                                            }) {
+                                                @Override
+                                                protected Map<String, String> getParams() {
+                                                    Map<String, String> parameters = new HashMap<String, String>();
+                                                    parameters.put("from", from);
+                                                    parameters.put("subject", subject);
+                                                    parameters.put("message", message);
+                                                    parameters.put("urgent", urgent);
+                                                    return parameters;
+                                                }
+                                            };
+                                            request.setRetryPolicy(new DefaultRetryPolicy(0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                                            requestQueue = Volley.newRequestQueue(getApplicationContext());
+                                            requestQueue.add(request);
 
-                                        }
-                                    }, new Response.ErrorListener() {
-                                        @Override
-                                        public void onErrorResponse(VolleyError error) {
-                                            offline.setText("error while sending a message!");
+                                        } else {
+                                            ImageView network = (ImageView) dialog.findViewById(R.id.offline_message);
+                                            network.setBackgroundResource(R.drawable.offline);
+                                            offline.setText("No internet Connection!");
                                             textAnim.setDuration(50);
                                             textAnim.setStartOffset(20);
                                             textAnim.setRepeatMode(Animation.REVERSE);
                                             textAnim.setRepeatCount(3);
+                                            network.startAnimation(textAnim);
                                             offline.startAnimation(textAnim);
                                         }
-
-                                    }) {
-                                        @Override
-                                        protected Map<String,String> getParams(){
-                                            Map<String,String> parameters = new HashMap<String,String>();
-                                            parameters.put("from", from);
-                                            parameters.put("subject", subject);
-                                            parameters.put("message", message);
-                                            parameters.put("urgent", urgent);
-                                            return parameters;
-                                        }
-                                    };
-                                    request.setRetryPolicy(new DefaultRetryPolicy(0,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-                                    requestQueue = Volley.newRequestQueue(getApplicationContext( ));
-                                    requestQueue.add(request);
-
-                                }
-                                else
-                                {
-                                    ImageView network = (ImageView)dialog.findViewById(R.id.offline_message);
-                                    network.setBackgroundResource(R.drawable.offline);
-                                    offline.setText("No internet Connection!");
-                                    textAnim.setDuration(50);
-                                    textAnim.setStartOffset(20);
-                                    textAnim.setRepeatMode(Animation.REVERSE);
-                                    textAnim.setRepeatCount(3);
-                                    network.startAnimation(textAnim);
-                                    offline.startAnimation(textAnim);
-                                }
+                                    }
+                                });
                             }
-                        });
+                            else
+                            {
+                                dialogprogress.dismiss();
+                                textView.setText("Oops!!, Incorrect Username or Password.");
+                                textAnim.setDuration(50);
+                                textAnim.setStartOffset(20);
+                                textAnim.setRepeatMode(Animation.REVERSE);
+                                textAnim.setRepeatCount(3);
+                                textView.startAnimation(textAnim);
+                            }
+                        }
 
-                    }
-                    else
-                    {
-                        TextView textView = (TextView)dialog.findViewById(R.id.error);
-                        textView.setText("Incorrect Username or Password. Please try again or later!");
-                        textAnim.setDuration(50);
-                        textAnim.setStartOffset(20);
-                        textAnim.setRepeatMode(Animation.REVERSE);
-                        textAnim.setRepeatCount(3);
-                        textView.startAnimation(textAnim);
-                    }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            textView.setText("Incorrect Username or Password.");
+                            textAnim.setDuration(50);
+                            textAnim.setStartOffset(20);
+                            textAnim.setRepeatMode(Animation.REVERSE);
+                            textAnim.setRepeatCount(3);
+                            textView.startAnimation(textAnim);
+
+                        }
+
+                    }) {
+                        @Override
+                        protected Map<String,String> getParams(){
+                            Map<String,String> parameters = new HashMap<String,String>();
+                            parameters.put("username", user);
+                            parameters.put("password", pass);
+                            return parameters;
+                        }
+                    };
+
+                    requestQueue = Volley.newRequestQueue(getApplicationContext( ));
+                    requestQueue.add(request);
+
                 }
             });
             dialog.show();
@@ -637,7 +707,18 @@ public class MainActivity extends AppCompatActivity
 
         String name = choose.getText().toString().trim();
         String path = getRealPath(getApplicationContext(),filepath);
-        uploadFilePath=path;
+        try {
+            if (path.isEmpty()) {
+                uploadFilePath = name.substring(7);
+            } else {
+                uploadFilePath = path;
+            }
+        }
+        catch (Exception ex)
+        {
+            uploadFilePath = name.substring(7);
+        }
+
         if(path == null)
         {
 
@@ -657,7 +738,7 @@ public class MainActivity extends AppCompatActivity
                             .addParameter("name",name)
                             .setMethod("POST")
                             .setNotificationConfig(new UploadNotificationConfig())
-                            .setMaxRetries(2)
+                            .setMaxRetries(1)
                             .startUpload();
 
                 }
@@ -673,7 +754,7 @@ public class MainActivity extends AppCompatActivity
 
         }
     }
-    public int uploadFile(String sourceFileUri,String sender,String title,String desc) {
+    public int uploadFile(String sourceFileUri,final String sender,final String title,final String desc) {
 
 
         String fileName = sourceFileUri;
@@ -723,10 +804,11 @@ public class MainActivity extends AppCompatActivity
                 conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
                 conn.setRequestProperty("uploaded_file", fileName);
 
+
                 dos = new DataOutputStream(conn.getOutputStream());
 
                 dos.writeBytes(twoHyphens + boundary + lineEnd);
-                dos.writeBytes("Content-Disposition: form-data; sender=\"sender\"; title=\"title\"; desc=\"desc\"; name=\"uploaded_file\";filename=\""
+                dos.writeBytes("Content-Disposition: form-data;name=\"uploaded_file\";filename=\""
                                 + fileName + "\"" + lineEnd);
 
                 dos.writeBytes(lineEnd);
@@ -752,7 +834,6 @@ public class MainActivity extends AppCompatActivity
                 // send multipart form data necesssary after file data...
                 dos.writeBytes(lineEnd);
                 dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-
                 // Responses from the server (code and message)
                 serverResponseCode = conn.getResponseCode();
                 String serverResponseMessage = conn.getResponseMessage();
@@ -764,10 +845,33 @@ public class MainActivity extends AppCompatActivity
 
                     runOnUiThread(new Runnable() {
                         public void run() {
+                            String urlUpdate = "http://dms.plattdriveprimary.co.za/updatedocument.php";
+                            StringRequest request = new StringRequest(Request.Method.POST,urlUpdate, new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    String msg = "File Upload Completed.";
+                                    messageText.setText(msg);
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
 
-                            String msg = "File Upload Completed.";
+                                }
 
-                            messageText.setText(msg);
+                            }) {
+                                @Override
+                                protected Map<String, String> getParams() {
+                                    Map<String, String> parameters = new HashMap<String, String>();
+                                    parameters.put("sender", sender);
+                                    parameters.put("title", title);
+                                    parameters.put("desc", desc);
+                                    return parameters;
+                                }
+                            };
+                            request.setRetryPolicy(new DefaultRetryPolicy(0,0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                            requestQueue = Volley.newRequestQueue(getApplicationContext());
+                            requestQueue.add(request);
+
                         }
                     });
                 }
@@ -824,5 +928,4 @@ public class MainActivity extends AppCompatActivity
         iv.startAnimation(anim);
         messages.setActionView(iv);
     }
-
 }
